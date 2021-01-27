@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-
+const { shell } = window.require('electron')
 const MainHomeDiv = styled.div`
     display: flex;
     flex 1;
@@ -45,7 +45,9 @@ function Home() {
         </p>
       </Description>
       <CreatedBy>
-        <p><b>Created By:</b></p>
+        <p onClick={()=>{shell.openExternal("https://github.com/lukgla")}}>
+          <b>Created By:</b>
+        </p>
         <GitHolder>
           <StyledA
             href="https://github.com/SzymonFaligowski"

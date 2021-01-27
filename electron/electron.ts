@@ -1,6 +1,6 @@
 import { app, BrowserWindow, powerSaveBlocker, ipcMain } from 'electron'
 import * as isDev from 'electron-is-dev';
-import Getter from './electroncore/puppeteer';
+import Getter from './electroncore/engine/Getter';
 
 let idPowerSaveBolcker: any;
 let win: Electron.BrowserWindow | null;
