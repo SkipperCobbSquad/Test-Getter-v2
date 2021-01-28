@@ -32,6 +32,8 @@ class Getter extends EventEmitter {
     const browser = await puppeteer.launch({
       headless: false,
       executablePath: this.pathToChrome,
+      ignoreDefaultArgs: ["--disable-extensions","--enable-automation"],
+      defaultViewport: null
     });
     this.page = await browser.newPage();
     await this.page.goto(url);
