@@ -1,5 +1,3 @@
-import { EmptyStatement } from "typescript";
-
 export enum QuestionType {
     SINGLE_ANSWER = "SINGLE_ANSWER",
     TRUE_FALSE = "TRUE_FALSE",

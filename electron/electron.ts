@@ -31,7 +31,7 @@ function createWindow() {
 }
 
 app.on('ready', () => {
-    Getterv1.getTest('https://www.testportal.net/test.html?t=RtEFCPJaPkJg')
+    Getterv1.getTest('https://www.testportal.net/test.html?t=E6hjzPGAEjPb')
     createWindow();
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
     console.log(powerSaveBlocker.isStarted(idPowerSaveBolcker));

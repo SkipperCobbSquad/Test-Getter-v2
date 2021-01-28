@@ -1,3 +1,4 @@
+import { platform } from 'os'
 import * as puppeteer from 'puppeteer-core';
 import * as EventEmitter from 'events';
 import { JSDOM } from 'jsdom'
@@ -11,18 +12,26 @@ import {
 class Getter extends EventEmitter {
   page: puppeteer.Page;
   numberQuest: number;
-  listOfQuestions: Array<any>;
+  listOfQuestions: Array<QuestionInterface>;
+  pathToChrome: string;
+
+  private readonly os: string = platform();
 
   constructor() {
     super();
     this.page = null;
     this.numberQuest = 0;
     this.listOfQuestions = [];
+    if (this.os === 'win32') {
+      this.pathToChrome = 'start chrome'
+    } else {
+      this.pathToChrome = 'google-chrome'
+    }
   }
   async getTest(url: string) {
     const browser = await puppeteer.launch({
       headless: false,
-      executablePath: 'google-chrome',
+      executablePath: this.pathToChrome,
     });
     this.page = await browser.newPage();
     await this.page.goto(url);
@@ -42,8 +51,14 @@ class Getter extends EventEmitter {
         const rawQuest: any = await new JSDOM(await rawElement)
         //Scrap
         const quest: QuestionInterface = this.scrap(Array.from(await rawQuest.window.document.querySelector('.question-container').children));
+        this.listOfQuestions.push(quest);
         console.log(quest)
-        await this.page.click('.mdc-button');
+        if (quest.isRequired) {
+          console.log('FUCK')
+          //TODO: Requierer.ts <- to randomly resolve question
+        }
+        //Go to next question
+        await this.page.click('.test_button_box .mdc-button');
       }
     } catch (error) { console.log(error); }
   }
@@ -70,9 +85,13 @@ class Getter extends EventEmitter {
       () => document.querySelector('.question-area').innerHTML
     );
   }
-  private scrap(raw: any) {
+  private scrap(raw: Array<any>): QuestionInterface {
     const ID: number = +raw[0].value;
     const questType: QuestionType = raw[1].value;
+    let required: boolean = false;
+    if (raw[2].querySelector('.mandatory_question')) {
+      required = true;
+    }
     const rawQuest: Array<string> = [];
     raw[3].querySelectorAll('p').forEach((q: HTMLParagraphElement) => {
       rawQuest.push(q.textContent);
@@ -80,7 +99,7 @@ class Getter extends EventEmitter {
     const mainQuest: string = rawQuest.join(' ');
 
     const mainAnswer: Array<AnswerInterface> = [];
-    const rawTableAnswers: any = Array.from(raw[4].querySelectorAll('.answer_container'));
+    const rawTableAnswers: Array<any> = Array.from(raw[4].querySelectorAll('.answer_container'));
 
     if (questType === QuestionType.SINGLE_ANSWER ||
       questType === QuestionType.MULTI_ANSWER ||
@@ -92,7 +111,7 @@ class Getter extends EventEmitter {
         a.querySelectorAll('p').forEach((p: HTMLParagraphElement) => {
           preRenderAnswer.push(p.textContent)
         })
-        //TODO: Latex detector for math equations
+        //TODO: LateX detector for math equations
         const answer: AnswerInterface = {
           id: answerID,
           description: preRenderAnswer.join(' '),
@@ -100,11 +119,6 @@ class Getter extends EventEmitter {
         };
         mainAnswer.push(answer)
       });
-    }
-
-    let required: boolean = false;
-    if (raw[2].querySelector('.mandatory_question')) {
-      required = true;
     }
 
     const cleanQuest: QuestionInterface = {
