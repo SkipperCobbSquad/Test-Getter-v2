@@ -23,7 +23,7 @@ class Getter extends EventEmitter {
     this.numberQuest = 0;
     this.listOfQuestions = [];
     if (this.os === 'win32') {
-      this.pathToChrome = 'start chrome'
+      this.pathToChrome = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
     } else {
       this.pathToChrome = 'google-chrome'
     }
