@@ -8,7 +8,6 @@ export enum QuestionType {
 }
 
 export interface AnswerInterface {
-    hasLatex: boolean,
     description: string,
     id: number,
 }

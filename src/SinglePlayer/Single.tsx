@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 
-const MainSinleDiv = styled.div`
+const { ipcRenderer } = window.require('electron');
+
+const MainSingleDiv = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -29,14 +32,31 @@ const StyledInput = styled.input`
 `;
 
 function Single() {
+  const [input, setInput] = useState('');
+  const chandleChange = (e: any) => {
+    setInput(e.target.value);
+  };
+
   return (
-    <MainSinleDiv>
-        <h1>SinglePlayer Mode</h1>
+    <MainSingleDiv>
+      <h1>SinglePlayer Mode</h1>
       <InputWrapper>
-        <StyledInput placeholder="Input URL"></StyledInput>
-        <i className="icofont-ui-play icofont-2x"></i>
+        <StyledInput
+          placeholder="Input URL"
+          onChange={chandleChange}
+          value={input}
+        ></StyledInput>
+        <i
+          className="icofont-ui-play icofont-2x"
+          onClick={() => {
+            ipcRenderer.invoke(
+              'get-test',
+              input
+            );
+          }}
+        ></i>
       </InputWrapper>
-    </MainSinleDiv>
+    </MainSingleDiv>
   );
 }
 

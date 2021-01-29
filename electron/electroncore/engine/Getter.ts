@@ -8,6 +8,7 @@ import {
   QuestionInterface,
   TestInterface,
 } from '../helpers/testInteraces';
+import { runInThisContext } from 'vm';
 
 class Getter extends EventEmitter {
   page: puppeteer.Page;
@@ -32,8 +33,9 @@ class Getter extends EventEmitter {
     const browser = await puppeteer.launch({
       headless: false,
       executablePath: this.pathToChrome,
-      ignoreDefaultArgs: ["--disable-extensions","--enable-automation"],
-      defaultViewport: null
+      //TODO: Use this on resolver
+      // ignoreDefaultArgs: ["--disable-extensions","--enable-automation"],
+      // defaultViewport: null
     });
     this.page = await browser.newPage();
     await this.page.goto(url);
@@ -62,10 +64,20 @@ class Getter extends EventEmitter {
         //Go to next question
         await this.page.click('.test_button_box .mdc-button');
       }
+      const mainTest: TestInterface = { id: -1, numberOfQuestions: this.numberQuest, questions: this.listOfQuestions }
+      await this.emit('status', 'ready', mainTest)
+      await this.clean()
     } catch (error) { console.log(error); }
   }
 
+  clean() {
+    this.page = null;
+    this.numberQuest = 0;
+    this.listOfQuestions = [];
+  }
+
   private async login() {
+    await this.emit('status', 'Login')
     await this.page.evaluate(() => {
       document.querySelectorAll('input').forEach((input) => {
         if (!(input.type === 'hidden')) {
@@ -76,6 +88,7 @@ class Getter extends EventEmitter {
     await this.page.click('#start-form-submit');
   }
   private async getNumberQuest() {
+    await this.emit('status', 'Getting number of questions')
     this.numberQuest += await this.page.evaluate(() => {
       return +document
         .querySelector('.question_header_content')
@@ -117,7 +130,6 @@ class Getter extends EventEmitter {
         const answer: AnswerInterface = {
           id: answerID,
           description: preRenderAnswer.join(' '),
-          hasLatex: false
         };
         mainAnswer.push(answer)
       });
