@@ -8,10 +8,10 @@ import {
   QuestionInterface,
   TestInterface,
 } from '../helpers/testInteraces';
-import { runInThisContext } from 'vm';
 
 class Getter extends EventEmitter {
   page: puppeteer.Page;
+  testID: string;
   numberQuest: number;
   listOfQuestions: Array<QuestionInterface>;
   pathToChrome: string;
@@ -21,6 +21,7 @@ class Getter extends EventEmitter {
   constructor() {
     super();
     this.page = null;
+    this.testID = '';
     this.numberQuest = 0;
     this.listOfQuestions = [];
     if (this.os === 'win32') {
@@ -40,6 +41,8 @@ class Getter extends EventEmitter {
     this.page = await browser.newPage();
     await this.page.goto(url);
     try {
+      //Get testID
+      this.testID = url.split('=')[1]
       //Login to test
       await this.login();
       //Wait for first form
@@ -64,7 +67,7 @@ class Getter extends EventEmitter {
         //Go to next question
         await this.page.click('.test_button_box .mdc-button');
       }
-      const mainTest: TestInterface = { id: -1, numberOfQuestions: this.numberQuest, questions: this.listOfQuestions }
+      const mainTest: TestInterface = { id: this.testID, numberOfQuestions: this.numberQuest, questions: this.listOfQuestions }
       await this.emit('status', 'ready', mainTest)
       await this.clean()
     } catch (error) { console.log(error); }
@@ -72,6 +75,7 @@ class Getter extends EventEmitter {
 
   clean() {
     this.page = null;
+    this.testID= '';
     this.numberQuest = 0;
     this.listOfQuestions = [];
   }
