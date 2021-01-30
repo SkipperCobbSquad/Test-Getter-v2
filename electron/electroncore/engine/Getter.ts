@@ -1,13 +1,15 @@
-import { platform } from 'os'
+import { platform } from 'os';
 import * as puppeteer from 'puppeteer-core';
 import * as EventEmitter from 'events';
-import { JSDOM } from 'jsdom'
+import { JSDOM } from 'jsdom';
 import {
   QuestionType,
   AnswerInterface,
   QuestionInterface,
   TestInterface,
+  TestType,
 } from '../helpers/testInteraces';
+import { Test } from './Test';
 
 class Getter extends EventEmitter {
   page: puppeteer.Page;
@@ -25,12 +27,13 @@ class Getter extends EventEmitter {
     this.numberQuest = 0;
     this.listOfQuestions = [];
     if (this.os === 'win32') {
-      this.pathToChrome = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+      this.pathToChrome =
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
     } else {
-      this.pathToChrome = 'google-chrome'
+      this.pathToChrome = 'google-chrome';
     }
   }
-  async getTest(url: string) {
+  async getTest(url: string, type: TestType = TestType.UNKNOWN) {
     const browser = await puppeteer.launch({
       headless: false,
       executablePath: this.pathToChrome,
@@ -42,7 +45,7 @@ class Getter extends EventEmitter {
     await this.page.goto(url);
     try {
       //Get testID
-      this.testID = url.split('=')[1]
+      this.testID = url.split('=')[1];
       //Login to test
       await this.login();
       //Wait for first form
@@ -55,33 +58,52 @@ class Getter extends EventEmitter {
         //Getting raw html
         const rawElement: string = await this.getMeAQuestion();
         //Convert to DOMObject
-        const rawQuest: any = await new JSDOM(await rawElement)
+        const rawQuest: any = await new JSDOM(await rawElement);
         //Scrap
-        const quest: QuestionInterface = this.scrap(Array.from(await rawQuest.window.document.querySelector('.question-container').children));
+        const quest: QuestionInterface = this.scrap(
+          Array.from(
+            await rawQuest.window.document.querySelector('.question-container')
+              .children
+          )
+        );
         this.listOfQuestions.push(quest);
-        console.log(quest)
+        console.log(quest);
         if (quest.isRequired) {
-          console.log('FUCK')
+          console.log('FUCK');
           //TODO: Requierer.ts <- to randomly resolve question
         }
         //Go to next question
         await this.page.click('.test_button_box .mdc-button');
       }
-      const mainTest: TestInterface = { id: this.testID, numberOfQuestions: this.numberQuest, questions: this.listOfQuestions }
-      await this.emit('status', 'ready', mainTest)
-      await this.clean()
-    } catch (error) { console.log(error); }
+      //Create Main Object of test
+      const mainTest: TestInterface = {
+        id: this.testID,
+        numberOfQuestions: this.numberQuest,
+        questions: this.listOfQuestions,
+      };
+      //Send status of creation
+      await this.emit('status', 'ready');
+      //Send created Test
+      await this.emit('ready', new Test(mainTest, type))
+      //End getting
+      await browser.close();
+      await this.clean();
+    } catch (error) {
+      await browser.close();
+      await this.clean();
+      console.log(error);
+    }
   }
 
   clean() {
     this.page = null;
-    this.testID= '';
+    this.testID = '';
     this.numberQuest = 0;
     this.listOfQuestions = [];
   }
 
   private async login() {
-    await this.emit('status', 'Login')
+    await this.emit('status', 'Login');
     await this.page.evaluate(() => {
       document.querySelectorAll('input').forEach((input) => {
         if (!(input.type === 'hidden')) {
@@ -92,7 +114,7 @@ class Getter extends EventEmitter {
     await this.page.click('#start-form-submit');
   }
   private async getNumberQuest() {
-    await this.emit('status', 'Getting number of questions')
+    await this.emit('status', 'Getting number of questions');
     this.numberQuest += await this.page.evaluate(() => {
       return +document
         .querySelector('.question_header_content')
@@ -118,24 +140,31 @@ class Getter extends EventEmitter {
     const mainQuest: string = rawQuest.join(' ');
 
     const mainAnswer: Array<AnswerInterface> = [];
-    const rawTableAnswers: Array<any> = Array.from(raw[4].querySelectorAll('.answer_container'));
+    const rawTableAnswers: Array<any> = Array.from(
+      raw[4].querySelectorAll('.answer_container')
+    );
 
-    if (questType === QuestionType.SINGLE_ANSWER ||
+    if (
+      questType === QuestionType.SINGLE_ANSWER ||
       questType === QuestionType.MULTI_ANSWER ||
       questType === QuestionType.TRUE_FALSE ||
-      questType === QuestionType.SURVEY) {
+      questType === QuestionType.SURVEY
+    ) {
       rawTableAnswers.forEach((a: HTMLDivElement) => {
         const preRenderAnswer: Array<string> = [];
-        const answerID: number = + a.querySelector('label').getAttribute('for').split('_')[1];
+        const answerID: number = +a
+          .querySelector('label')
+          .getAttribute('for')
+          .split('_')[1];
         a.querySelectorAll('p').forEach((p: HTMLParagraphElement) => {
-          preRenderAnswer.push(p.textContent)
-        })
+          preRenderAnswer.push(p.textContent);
+        });
         //TODO: LateX detector for math equations
         const answer: AnswerInterface = {
           id: answerID,
           description: preRenderAnswer.join(' '),
         };
-        mainAnswer.push(answer)
+        mainAnswer.push(answer);
       });
     }
 
@@ -145,9 +174,10 @@ class Getter extends EventEmitter {
       isRequired: required,
       question: mainQuest,
       answers: mainAnswer,
-      hasLatex: false
-    }
-    return cleanQuest
+      hasLatex: false,
+      UsersAnswers: [],
+    };
+    return cleanQuest;
   }
 }
 

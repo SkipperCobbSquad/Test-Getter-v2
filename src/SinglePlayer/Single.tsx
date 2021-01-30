@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const { ipcRenderer } = window.require('electron');
@@ -33,9 +33,18 @@ const StyledInput = styled.input`
 
 function Single() {
   const [input, setInput] = useState('');
+  const [status, setStatus] = useState('');
   const chandleChange = (e: any) => {
     setInput(e.target.value);
   };
+  useEffect(() => {
+    ipcRenderer.on('getter-status', (e: any, stat: string) => {
+      console.log(stat);
+      setStatus(stat);
+    });
+  }, []);
+
+  console.log(`Here1`);
 
   return (
     <MainSingleDiv>
@@ -49,13 +58,11 @@ function Single() {
         <i
           className="icofont-ui-play icofont-2x"
           onClick={() => {
-            ipcRenderer.invoke(
-              'get-test',
-              input
-            );
+            ipcRenderer.invoke('get-test', input);
           }}
         ></i>
       </InputWrapper>
+      <p>{status}</p>
     </MainSingleDiv>
   );
 }
