@@ -26,11 +26,16 @@ export interface QuestionInterface {
   hasLatex: boolean;
   question: string;
   answers: Array<AnswerInterface>;
-  UsersAnswers?: Array<any>
+  UsersAnswers?: Array<UserAnswer>
 }
 
 export interface TestInterface {
   id: string;
   numberOfQuestions: number;
   questions: Array<QuestionInterface>;
+}
+
+export interface UserAnswer {
+  username: string,
+  answer: Array<AnswerInterface | string>
 }

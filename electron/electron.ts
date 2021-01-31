@@ -4,6 +4,7 @@ import Router from './electroncore/api/Router';
 
 let idPowerSaveBolcker: any;
 let win: Electron.BrowserWindow | null;
+let ApiRouter: Router; 
 
 
 function createWindow() {
@@ -33,7 +34,7 @@ app.on('ready', () => {
     createWindow();
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
     console.log(powerSaveBlocker.isStarted(idPowerSaveBolcker));
-    const ApiRouter: Router = new Router(win)
+    ApiRouter = new Router(win)
 });
 
 app.on('activate', () => {

@@ -20,16 +20,31 @@ export class Test extends EventEmitter {
     this.questions = test.questions;
   }
 
-  addAnswer(user: string, questionID: number, answer: (AnswerInterface | string)) {
+  cleanTest():any{
+    const clean : any = {
+      id: this.ID,
+      type: this.type,
+      numberOfQuestions : this.numberOfQuestions,
+      questions: this.questions
+    }
+    return clean
+  }
+
+  addAnswer(user: string, questionID: number, answer: Array<AnswerInterface | string>) {
     const question = this.findQuestion(questionID);
-    question.UsersAnswers.push({ user, answer });
+    const update = question.UsersAnswers.find(a => a.username === user)
+    if(update){
+      update.answer = answer;
+    }else{
+      question.UsersAnswers.push({ username: user, answer });
+    }
     this.emit('answerAdded', question);
   }
 
   removeAnswer(user: string, questionID: number) {
     const question = this.findQuestion(questionID);
     const indexToDelete: number = question.UsersAnswers.findIndex(
-      (a) => a.user === user
+      (a) => a.username === user
     );
     question.UsersAnswers.splice(indexToDelete, 1);
     this.emit('answerDeleted', question);

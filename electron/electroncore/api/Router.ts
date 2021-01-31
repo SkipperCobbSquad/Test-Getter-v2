@@ -1,7 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import Getter from '../engine/Getter';
 import { Test } from '../engine/Test';
-import { TestInterface } from '../helpers/testInteraces';
+import { QuestionInterface } from '../helpers/testInteraces';
 
 class Router {
   getterEngine: Getter;
@@ -16,13 +16,21 @@ class Router {
       this.getterEngine.getTest(url);
     });
 
-    this.getterEngine.on('status', (status: string, test: TestInterface) => {
+    this.getterEngine.on('status', (status: string) => {
       this.bWin.webContents.send('getter-status', status);
     });
 
-    this.getterEngine.on('ready', (test: Test)=>{
-        
+    this.getterEngine.on('ready', (test: Test) => {
+      this.mainTest = test;
+      this.mainTest.on('answerAdded', (q: QuestionInterface) => {
+        this.bWin.webContents.send('answerAdded', q)
+      })
     })
+
+    ipcMain.handle('test', async () => {
+      return this.mainTest.cleanTest();
+    })
+
   }
 }
 export default Router;
