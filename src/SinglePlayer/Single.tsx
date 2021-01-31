@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Redirect, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
 const { ipcRenderer } = window.require('electron');
@@ -32,19 +33,25 @@ const StyledInput = styled.input`
 `;
 
 function Single() {
+  let { path } = useRouteMatch();
   const [input, setInput] = useState('');
   const [status, setStatus] = useState('');
+  const [ready, setReady] = useState(false);
   const chandleChange = (e: any) => {
     setInput(e.target.value);
   };
   useEffect(() => {
-    ipcRenderer.on('getter-status', (e: any, stat: string) => {
-      console.log(stat);
-      setStatus(stat);
-    });
+    (async () => {
+      await ipcRenderer.on('getter-status', (e: any, stat: string) => {
+        console.log(stat);
+        if (stat === 'ready') {
+          setReady(true);
+        } else {
+          setStatus(stat);
+        }
+      });
+    })();
   }, []);
-
-  console.log(`Here1`);
 
   return (
     <MainSingleDiv>
@@ -63,6 +70,7 @@ function Single() {
         ></i>
       </InputWrapper>
       <p>{status}</p>
+      {ready ? <Redirect to={`${path}/test`}></Redirect> : null}
     </MainSingleDiv>
   );
 }
