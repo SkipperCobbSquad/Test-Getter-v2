@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { HashRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import {
+  HashRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect,
+} from 'react-router-dom';
 
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -70,8 +76,8 @@ const StyledLink = styled(Link)`
 const ContentDiv = styled.div`
   display: flex;
   flex 1;
-  padding: 10px;
-  background: #fefefe;
+  padding: 0px 10px;
+  background: #ffcbf2;
   border: 10px solid #6247aa;
   border-radius: 20px;
 `;
@@ -86,24 +92,24 @@ const BackToMenu = styled.div`
 function App() {
   const [location, setLocation] = useState(false);
 
-  const backToHome = ()=>{
+  const backToHome = () => {
     SwalBackToMenu.fire({
       icon: 'warning',
       title: 'Are you sure to exit?',
       showCancelButton: true,
       confirmButtonText: 'Go to Home!',
-    }).then(result =>{
-      if (result.isConfirmed){
-        window.location.href= '/#/';
-        setLocation(false)
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setLocation(false);
       }
-    })
-  }
+    });
+  };
 
   return (
     <MainDiv>
       <MenuDiv>
         <Router>
+        {location ? null : <Redirect to={`/#/`}></Redirect>}
           <BarDiv style={{ display: location ? 'none' : 'flex' }}>
             <BarItem title="Home">
               <StyledLink to="/">
@@ -137,7 +143,11 @@ function App() {
             </BarItem>
           </BarDiv>
           <ContentDiv>
-            <BackToMenu title="Back To Home" style={{display: location? 'flex' : 'none'}} onClick={backToHome}>
+            <BackToMenu
+              title="Back To Home"
+              style={{ display: location ? 'flex' : 'none' }}
+              onClick={backToHome}
+            >
               <i className="icofont-arrow-right icofont-rotate-180 icofont-2x"></i>
             </BackToMenu>
             <Switch>

@@ -1,4 +1,11 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
+
+import { QuestionInterface, QuestionType } from '../helpers/testInterfaces';
+
+import Desc from './MasterAnswers/MasterDesc';
+
+const  ipcRenderer  = window.require('electron').ipcRenderer.setMaxListeners(0)
 
 const QuestDiv = styled.div`
   display: flex;
@@ -22,13 +29,35 @@ const QuestPTop: any = styled.p`
 `;
 
 function MasterQuestion(props: any) {
-  const q: any = props.quest;
+  const qR: QuestionInterface = props.quest;
+  const [q, setQ] = useState(qR);
+  useEffect(() => {
+    (async () => {
+      await ipcRenderer.on(
+        'answerAdded',
+        (e: any, question: QuestionInterface) => {
+          if (question.id === q.id) {
+            setQ(question);
+          }
+        }
+      );
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const answerPicker = (type: QuestionType) => {
+    if (type === QuestionType.DESCRIPTIVE) {
+      return <Desc guestionId={q.id} answers={q.UsersAnswers}></Desc>;
+    }
+  };
+
   return (
     <QuestDiv>
       <QuestTop>
         <QuestPTop>{q.question}</QuestPTop>
         <QuestPTop type>Question type: {q.type}</QuestPTop>
       </QuestTop>
+      {answerPicker(q.type)}
     </QuestDiv>
   );
 }

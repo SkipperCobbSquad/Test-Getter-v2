@@ -68,6 +68,7 @@ class Getter extends EventEmitter {
         );
         this.listOfQuestions.push(quest);
         console.log(quest);
+        await this.emit('status', `Getting ${i}/${this.numberQuest}`)
         if (quest.isRequired) {
           console.log('FUCK');
           //TODO: Requierer.ts <- to randomly resolve question

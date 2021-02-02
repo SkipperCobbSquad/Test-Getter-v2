@@ -1,9 +1,9 @@
 import * as EventEmitter from 'events';
 import {
-    AnswerInterface,
   QuestionInterface,
   TestInterface,
   TestType,
+  UserAnswer
 } from '../helpers/testInteraces';
 
 export class Test extends EventEmitter {
@@ -30,13 +30,13 @@ export class Test extends EventEmitter {
     return clean
   }
 
-  addAnswer(user: string, questionID: number, answer: Array<AnswerInterface | string>) {
+  addAnswer(userAnswer:  UserAnswer, questionID: number) {
     const question = this.findQuestion(questionID);
-    const update = question.UsersAnswers.find(a => a.username === user)
+    const update = question.UsersAnswers.find(a => a.username === userAnswer.username)
     if(update){
-      update.answer = answer;
+      update.answer = userAnswer.answer;
     }else{
-      question.UsersAnswers.push({ username: user, answer });
+      question.UsersAnswers.push(userAnswer);
     }
     this.emit('answerAdded', question);
   }
