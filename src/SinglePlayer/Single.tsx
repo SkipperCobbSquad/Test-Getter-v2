@@ -42,6 +42,7 @@ function Single() {
   };
   useEffect(() => {
     (async () => {
+      await ipcRenderer.removeAllListeners()
       await ipcRenderer.on('getter-status', (e: any, stat: string) => {
         console.log(stat);
         if (stat === 'ready') {
@@ -76,4 +77,3 @@ function Single() {
 }
 
 export default Single;
-//TODO: Nested routinh here Single

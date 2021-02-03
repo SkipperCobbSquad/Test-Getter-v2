@@ -26,7 +26,7 @@ export enum QuestionType {
     hasLatex: boolean;
     question: string;
     answers: Array<AnswerInterface>;
-    UsersAnswers?: Array<UserAnswer>
+    UsersAnswers: Array<UserAnswer>
   }
   
   export interface TestInterface {

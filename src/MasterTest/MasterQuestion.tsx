@@ -3,7 +3,8 @@ import styled from 'styled-components';
 
 import { QuestionInterface, QuestionType } from '../helpers/testInterfaces';
 
-import Desc from './MasterAnswers/MasterDesc';
+import DescShrot from './MasterAnswers/MasterDescShort';
+import Multi from './MasterAnswers/MasterMulti';
 
 const  ipcRenderer  = window.require('electron').ipcRenderer.setMaxListeners(0)
 
@@ -22,7 +23,7 @@ const QuestTop = styled.div`
 `;
 
 const QuestPTop: any = styled.p`
-  background: ${(props: any) => (props.type ? '#b298dc' : '#e0aaff')};
+  background: ${(props: any) => (props.qType ? '#b298dc' : '#e0aaff')};
   padding: 5px;
   border-radius: 10px;
   margin: 7px 0px;
@@ -42,12 +43,15 @@ function MasterQuestion(props: any) {
         }
       );
     })();
+    return ()=>{ipcRenderer.removeAllListeners()}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const answerPicker = (type: QuestionType) => {
-    if (type === QuestionType.DESCRIPTIVE) {
-      return <Desc guestionId={q.id} answers={q.UsersAnswers}></Desc>;
+    if (type === QuestionType.DESCRIPTIVE || type === QuestionType.SHORT_ANSWER) {
+      return <DescShrot qType={type} guestionId={q.id} UserAnswers={q.UsersAnswers}></DescShrot>;
+    }else if(type === QuestionType.MULTI_ANSWER){
+      return <Multi guestionId={q.id} answers={q.answers}  UserAnswers={q.UsersAnswers}></Multi>
     }
   };
 
@@ -55,7 +59,7 @@ function MasterQuestion(props: any) {
     <QuestDiv>
       <QuestTop>
         <QuestPTop>{q.question}</QuestPTop>
-        <QuestPTop type>Question type: {q.type}</QuestPTop>
+        <QuestPTop qType>Question type: {q.type}</QuestPTop>
       </QuestTop>
       {answerPicker(q.type)}
     </QuestDiv>

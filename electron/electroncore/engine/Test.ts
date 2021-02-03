@@ -54,3 +54,4 @@ export class Test extends EventEmitter {
     return this.questions.find((q) => q.id === questionID);
   }
 }
+//TODO: Chceck type answer whit question type for backend safety
