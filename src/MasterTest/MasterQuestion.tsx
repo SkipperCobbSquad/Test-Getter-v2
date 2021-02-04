@@ -42,6 +42,14 @@ function MasterQuestion(props: any) {
           }
         }
       );
+      await ipcRenderer.on(
+        'answerDeleted',
+        (e: any, question: QuestionInterface) => {
+          if (question.id === q.id) {
+            setQ(question);
+          }
+        }
+      );
     })();
     return ()=>{ipcRenderer.removeAllListeners()}
     // eslint-disable-next-line react-hooks/exhaustive-deps

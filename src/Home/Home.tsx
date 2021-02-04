@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-const { shell } = window.require('electron')
+const { shell } = window.require('electron');
 const MainHomeDiv = styled.div`
     display: flex;
     flex 1;
@@ -24,9 +24,10 @@ const GitHolder = styled.div`
   justify-content: center;
 `;
 
-const StyledA = styled.a`
+const StyledImgHolder = styled.div`
   width: 10%;
   margin: 2px 10px;
+  cursor: pointer;
 `;
 
 const GitProfile = styled.img`
@@ -45,30 +46,30 @@ function Home() {
         </p>
       </Description>
       <CreatedBy>
-        <p onClick={()=>{shell.openExternal("https://github.com/lukgla")}}>
+        <p>
           <b>Created By:</b>
         </p>
         <GitHolder>
-          <StyledA
-            href="https://github.com/SzymonFaligowski"
-            target="_blank"
-            rel="noreferrer"
+          <StyledImgHolder
+            onClick={() => {
+              shell.openExternal('https://github.com/SzymonFaligowski');
+            }}
           >
             <GitProfile
               src="https://avatars.githubusercontent.com/u/46247235?s=460&u=69a23997164775b4446de1822779612593880465&v=4"
               alt="Skipper"
             ></GitProfile>
-          </StyledA>
-          <StyledA
-            href="https://github.com/lukgla"
-            target="_blank"
-            rel="noreferrer"
+          </StyledImgHolder>
+          <StyledImgHolder
+            onClick={() => {
+              shell.openExternal('https://github.com/lukgla');
+            }}
           >
             <GitProfile
               src="https://avatars.githubusercontent.com/u/52761889?s=400&v=4"
               alt="lukgla"
             ></GitProfile>
-          </StyledA>
+          </StyledImgHolder>
         </GitHolder>
       </CreatedBy>
     </MainHomeDiv>

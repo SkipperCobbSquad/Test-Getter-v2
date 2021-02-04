@@ -23,15 +23,20 @@ class Router {
     this.getterEngine.on('ready', (test: Test) => {
       //Clean Up fucking shit
       ipcMain.removeHandler('answerAdded')
+      ipcMain.removeHandler('answerDeleted')
       ipcMain.removeAllListeners();
       this.mainTest = test;
-      ipcMain.handle('answerAdded', (e :any ,answer: UserAnswer, questID: number)=>{
+      ipcMain.handle('answerAdded', (e: any, answer: UserAnswer, questID: number) => {
         this.mainTest.addAnswer(answer, questID)
-        console.log('Here1');
       })
       this.mainTest.on('answerAdded', (q: QuestionInterface) => {
         this.bWin.webContents.send('answerAdded', q)
-        console.log('Here2');
+      })
+      ipcMain.handle('answerDeleted', (e: any, username: string, questID: number) => {
+        this.mainTest.removeAnswer(username, questID)
+      })
+      this.mainTest.on('answerDeleted', (q: QuestionInterface) => {
+        this.bWin.webContents.send('answerDeleted', q)
       })
     })
 
@@ -42,3 +47,4 @@ class Router {
   }
 }
 export default Router;
+//TODO: Make methotds ==> clean() IPCclean() startListening() <- for Test (single, multi)

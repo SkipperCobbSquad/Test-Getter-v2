@@ -46,8 +46,10 @@ export class Test extends EventEmitter {
     const indexToDelete: number = question.UsersAnswers.findIndex(
       (a) => a.username === user
     );
-    question.UsersAnswers.splice(indexToDelete, 1);
-    this.emit('answerDeleted', question);
+    if(indexToDelete>=0){
+      question.UsersAnswers.splice(indexToDelete, 1);
+      this.emit('answerDeleted', question);
+    }
   }
 
   private findQuestion(questionID: number) {
