@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { AnswerInterface } from '../../helpers/testInterfaces';
-import { CollectingAnswers, Multi } from '../../helpers/ReactInterfaces';
+import { CollectingAnswers, SingleMulti } from '../../helpers/ReactInterfaces';
 
 import AnswerDiv from '../MasterHolders/MasterMultiAnswerHolder';
 
@@ -18,24 +18,7 @@ const AnswersHolder = styled.div`
   overflow: auto;
 `;
 
-const SubmmitUpdateButton = styled.button`
-  display: flex;
-  justify-content: center;
-  padding: 5px 0;
-  margin-top: 7px;
-  border: 5px solid #f896d8;
-  font-weight: bold;
-  background: #efc7e5;
-  border-radius: 10px;
-  outline: none;
-  transition: background 0.15s ease-in-out;
-  &:hover {
-    background: #e18ad4;
-    outline: none;
-  }
-`;
-
-function MasterMulti(props: Multi) {
+function MasterMulti(props: SingleMulti) {
   const [answers, setAnswers] = useState([]);
   const Collection: Array<CollectingAnswers> = [];
 

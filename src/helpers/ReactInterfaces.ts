@@ -1,5 +1,5 @@
 import { AnswerInterface, UserAnswer } from './testInterfaces';
-export interface Multi {
+export interface SingleMulti {
   guestionId: number;
   answers: Array<AnswerInterface>;
   UserAnswers: Array<UserAnswer>;

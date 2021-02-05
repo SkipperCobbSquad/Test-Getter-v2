@@ -5,6 +5,7 @@ import { QuestionInterface, QuestionType } from '../helpers/testInterfaces';
 
 import DescShrot from './MasterAnswers/MasterDescShort';
 import Multi from './MasterAnswers/MasterMulti';
+import Single from './MasterAnswers/MasterSingle';
 
 const  ipcRenderer  = window.require('electron').ipcRenderer.setMaxListeners(0)
 
@@ -60,6 +61,8 @@ function MasterQuestion(props: any) {
       return <DescShrot qType={type} guestionId={q.id} UserAnswers={q.UsersAnswers}></DescShrot>;
     }else if(type === QuestionType.MULTI_ANSWER){
       return <Multi guestionId={q.id} answers={q.answers}  UserAnswers={q.UsersAnswers}></Multi>
+    }else{
+      return <Single guestionId={q.id} answers={q.answers}  UserAnswers={q.UsersAnswers}></Single>
     }
   };
 
