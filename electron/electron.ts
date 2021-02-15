@@ -1,10 +1,11 @@
-import { app, BrowserWindow, powerSaveBlocker } from 'electron'
+import { app, BrowserWindow, powerSaveBlocker, ipcMain } from 'electron'
 import * as isDev from 'electron-is-dev';
 import Router from './electroncore/api/Router';
+import { MultiRouter } from './electroncore/api/MultiRouter';
 
 let idPowerSaveBolcker: any;
 let win: Electron.BrowserWindow | null;
-let ApiRouter: Router; 
+let ApiRouter: any
 
 
 function createWindow() {
@@ -34,7 +35,6 @@ app.on('ready', () => {
     createWindow();
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
     console.log(powerSaveBlocker.isStarted(idPowerSaveBolcker));
-    ApiRouter = new Router(win)
 });
 
 app.on('activate', () => {
@@ -46,3 +46,24 @@ app.on('activate', () => {
 app.on('quit', () => {
     powerSaveBlocker.stop(idPowerSaveBolcker);
 });
+
+ipcMain.handle('single', () => {
+    ApiRouter = null;
+    ApiRouter = new Router(win)
+})
+
+ipcMain.handle('multi', (e: any, url: string) => {
+    ApiRouter = null;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return new Promise((resolve, reject) => {
+        ApiRouter = new MultiRouter(win, url)
+        ApiRouter.on('ready', () => {
+            resolve(null)
+        })
+    })
+})
+
+ipcMain.handle('leave', (e: any) => {
+    ApiRouter.leave()
+    ApiRouter = null;
+})

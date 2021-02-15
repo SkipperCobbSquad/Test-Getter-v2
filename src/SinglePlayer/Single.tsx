@@ -43,6 +43,7 @@ function Single() {
   useEffect(() => {
     (async () => {
       await ipcRenderer.removeAllListeners()
+      await ipcRenderer.invoke('single')
       await ipcRenderer.on('getter-status', (e: any, stat: string) => {
         console.log(stat);
         if (stat === 'ready') {
@@ -52,6 +53,7 @@ function Single() {
         }
       });
     })();
+    // return ()=>{ipcRenderer.removeAllListeners(); ipcRenderer.invoke('leave')}
   }, []);
 
   return (

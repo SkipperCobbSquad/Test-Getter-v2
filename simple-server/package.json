@@ -1,0 +1,20 @@
+{
+  "name": "simple-connect",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/socket.io": "^2.1.13",
+    "ts-node": "^9.1.1"
+  },
+  "dependencies": {
+    "socket.io": "^3.1.1"
+  }
+}

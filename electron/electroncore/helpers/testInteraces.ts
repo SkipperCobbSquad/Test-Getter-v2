@@ -14,6 +14,18 @@ export enum TestType {
   UNKNOWN = 'UNKNOWN',
 }
 
+// Mutliplayer=========================>
+export enum ServerCallbacks {
+  OK = 'ok',
+  ERROR = 'Error'
+}
+
+export enum ServerReasons {
+  USEREXIST = "Username taken",
+  TESTEXIST = "This test name exist"
+}
+//====================================>
+
 export interface AnswerInterface {
   description: string;
   id: number;
@@ -39,3 +51,10 @@ export interface UserAnswer {
   username: string,
   answer: Array<AnswerInterface | string>
 }
+
+// Mutliplayer=========================>
+export interface Call {
+  status: ServerCallbacks
+  reason?: ServerReasons;
+}
+//====================================>

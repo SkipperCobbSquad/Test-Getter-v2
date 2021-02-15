@@ -11,6 +11,8 @@ class Router {
   constructor(window: BrowserWindow) {
     this.getterEngine = new Getter();
     this.bWin = window;
+    ipcMain.removeHandler('get-test')
+    ipcMain.removeHandler('test')
 
     ipcMain.handle('get-test', async (e: any, url: string) => {
       this.getterEngine.getTest(url);
@@ -43,6 +45,10 @@ class Router {
     ipcMain.handle('test', async () => {
       return this.mainTest.cleanTest();
     })
+
+  }
+
+  leave() {
 
   }
 }

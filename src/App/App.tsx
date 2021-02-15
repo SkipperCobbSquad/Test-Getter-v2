@@ -12,7 +12,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 import Home from '../Home/Home';
 import Single from '../SinglePlayer/Main';
-import Multi from '../MultiPlayer/Multi';
+import Multi from '../MultiPlayer/Main';
 import Settings from '../Settings/Settings';
 
 import styled from 'styled-components';
