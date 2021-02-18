@@ -1,11 +1,13 @@
-import { app, BrowserWindow, powerSaveBlocker, ipcMain } from 'electron'
+import { app, BrowserWindow, powerSaveBlocker, ipcMain, globalShortcut } from 'electron'
 import * as isDev from 'electron-is-dev';
 import Router from './electroncore/api/Router';
 import { MultiRouter } from './electroncore/api/MultiRouter';
+import {MasterRouter} from './electroncore/api/MasterRouter';
 
 let idPowerSaveBolcker: any;
 let win: Electron.BrowserWindow | null;
 let ApiRouter: any
+// let master: MasterRouter
 
 
 function createWindow() {
@@ -33,8 +35,13 @@ function createWindow() {
 
 app.on('ready', () => {
     createWindow();
+    // master = new MasterRouter(win)
+    // master.registerSocket('http://localhost:4000')
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
     console.log(powerSaveBlocker.isStarted(idPowerSaveBolcker));
+    globalShortcut.register('Control+Alt+V', () => {
+        win.focus()
+    })
 });
 
 app.on('activate', () => {
@@ -43,8 +50,12 @@ app.on('activate', () => {
     }
 });
 
-app.on('quit', () => {
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
     powerSaveBlocker.stop(idPowerSaveBolcker);
+})
+
+app.on('quit', () => {
 });
 
 ipcMain.handle('single', () => {

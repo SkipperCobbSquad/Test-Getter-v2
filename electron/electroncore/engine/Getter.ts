@@ -92,7 +92,8 @@ class Getter extends EventEmitter {
     } catch (error) {
       await browser.close();
       await this.clean();
-      console.log(error);
+      console.log(error.toString());
+      await this.emit('status', error.toString());
     }
   }
 

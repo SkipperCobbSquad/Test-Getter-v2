@@ -103,7 +103,7 @@ function Multi() {
         //     setReady(true);
         //   });
       // ipcRenderer.invoke('JoinTest', 'TESTIO').then(()=>{
-      //     setReady(true);
+      //     setReady(false);
       // })
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,7 +142,7 @@ function Multi() {
                 }}
               ></SingleAnswer>
             ))
-          : null}
+          : <SingleTestDiv>No tests!!!</SingleTestDiv>}
       </TestsDiv>
       <StarterDiv>
         <CreateButton>Create My Own</CreateButton>

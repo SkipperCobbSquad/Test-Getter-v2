@@ -27,7 +27,6 @@ export class MultiRouter extends EventEmitter {
         ipcMain.removeHandler('JoinTest');
         ipcMain.removeHandler('answerAdded')
 
-
         this.socket.on('connect', () => {
             this.emit('ready')
         })
