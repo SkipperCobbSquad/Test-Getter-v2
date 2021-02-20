@@ -7,7 +7,7 @@ import {MasterRouter} from './electroncore/api/MasterRouter';
 let idPowerSaveBolcker: any;
 let win: Electron.BrowserWindow | null;
 let ApiRouter: any
-// let master: MasterRouter
+let master: MasterRouter
 
 
 function createWindow() {
@@ -35,7 +35,7 @@ function createWindow() {
 
 app.on('ready', () => {
     createWindow();
-    // master = new MasterRouter(win)
+    master = new MasterRouter(win)
     // master.registerSocket('http://localhost:4000')
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
     console.log(powerSaveBlocker.isStarted(idPowerSaveBolcker));
@@ -58,23 +58,23 @@ app.on('will-quit', () => {
 app.on('quit', () => {
 });
 
-ipcMain.handle('single', () => {
-    ApiRouter = null;
-    ApiRouter = new Router(win)
-})
+// ipcMain.handle('single', () => {
+//     ApiRouter = null;
+//     ApiRouter = new Router(win)
+// })
 
-ipcMain.handle('multi', (e: any, url: string) => {
-    ApiRouter = null;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return new Promise((resolve, reject) => {
-        ApiRouter = new MultiRouter(win, url)
-        ApiRouter.on('ready', () => {
-            resolve(null)
-        })
-    })
-})
+// ipcMain.handle('multi', (e: any, url: string) => {
+//     ApiRouter = null;
+//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//     return new Promise((resolve, reject) => {
+//         ApiRouter = new MultiRouter(win, url)
+//         ApiRouter.on('ready', () => {
+//             resolve(null)
+//         })
+//     })
+// })
 
-ipcMain.handle('leave', (e: any) => {
-    ApiRouter.leave()
-    ApiRouter = null;
-})
+// ipcMain.handle('leave', (e: any) => {
+//     ApiRouter.leave()
+//     ApiRouter = null;
+// })

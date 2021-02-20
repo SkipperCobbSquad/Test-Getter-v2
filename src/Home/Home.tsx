@@ -52,7 +52,7 @@ function Home() {
         <GitHolder>
           <StyledImgHolder
             onClick={() => {
-              shell.openExternal('https://github.com/SzymonFaligowski');
+              shell.openExternal('https://github.com/SkipperCobbSquad');
             }}
           >
             <GitProfile

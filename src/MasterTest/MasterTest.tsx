@@ -24,7 +24,7 @@ const MainDiv = styled.div`
 
 function MasterTest(props: any) {
   const test = props.test;
-
+  //TODO: This test is cleanTest() add ipc for listening new questions
   return (
     <MainDiv>
       {test.questions.map((q: any) => (

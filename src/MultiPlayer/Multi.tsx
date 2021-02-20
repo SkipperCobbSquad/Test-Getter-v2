@@ -93,15 +93,15 @@ function Multi() {
         console.log(tests);
         setTests(tests);
       });
-        // ipcRenderer
-        //   .invoke(
-        //     'registerTest',
-        //     'https://www.testportal.net/test.html?t=RtEFCPJaPkJg',
-        //     'TESTIO'
-        //   )
-        //   .then(() => {
-        //     setReady(true);
-        //   });
+        ipcRenderer
+          .invoke(
+            'registerTest',
+            '',
+            'HIS'
+          )
+          .then(() => {
+            setReady(true);
+          });
       // ipcRenderer.invoke('JoinTest', 'TESTIO').then(()=>{
       //     setReady(false);
       // })

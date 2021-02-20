@@ -3,6 +3,11 @@ export enum Mode {
     MULTI = "Multi"
 }
 
+export enum ServerMode {
+    PRIVATE = "PRIVATE",
+    PUBLIC = "PUBLIC"
+}
+
 export enum ServerCallbacks {
     OK = 'ok',
     ERROR = 'Error'
@@ -13,7 +18,16 @@ export enum ServerReasons {
     TESTEXIST = "This test name exist"
 }
 
-export interface Call {
+export interface PBCall {
     status: ServerCallbacks
     reason?: ServerReasons;
+    test?: string;
+}
+
+export interface  PVCall {
+    status: ServerCallbacks
+    username?: string,
+    reason?: ServerReasons;
+    test?: string;
+
 }

@@ -42,15 +42,8 @@ function Single() {
   };
   useEffect(() => {
     (async () => {
-      await ipcRenderer.removeAllListeners()
-      await ipcRenderer.invoke('single')
       await ipcRenderer.on('getter-status', (e: any, stat: string) => {
-        console.log(stat);
-        if (stat === 'ready') {
-          setReady(true);
-        } else {
-          setStatus(stat);
-        }
+        setStatus(stat);
       });
     })();
     // return ()=>{ipcRenderer.removeAllListeners(); ipcRenderer.invoke('leave')}
@@ -68,7 +61,11 @@ function Single() {
         <i
           className="icofont-ui-play icofont-2x"
           onClick={() => {
-            ipcRenderer.invoke('get-test', input);
+            ipcRenderer.invoke('registerTest', input).then((res: string) => {
+              if (res === 'ok') {
+                setReady(true);
+              }
+            });
           }}
         ></i>
       </InputWrapper>

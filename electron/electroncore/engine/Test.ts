@@ -20,22 +20,22 @@ export class Test extends EventEmitter {
     this.questions = test.questions;
   }
 
-  cleanTest():any{
-    const clean : any = {
+  cleanTest(): any {
+    const clean: any = {
       id: this.ID,
       type: this.type,
-      numberOfQuestions : this.numberOfQuestions,
+      numberOfQuestions: this.numberOfQuestions,
       questions: this.questions
     }
     return clean
   }
 
-  addAnswer(userAnswer:  UserAnswer, questionID: number) {
+  addAnswer(userAnswer: UserAnswer, questionID: number) {
     const question = this.findQuestion(questionID);
     const update = question.UsersAnswers.find(a => a.username === userAnswer.username)
-    if(update){
+    if (update) {
       update.answer = userAnswer.answer;
-    }else{
+    } else {
       question.UsersAnswers.push(userAnswer);
     }
     this.emit('answerAdded', question);
@@ -46,9 +46,16 @@ export class Test extends EventEmitter {
     const indexToDelete: number = question.UsersAnswers.findIndex(
       (a) => a.username === user
     );
-    if(indexToDelete>=0){
+    if (indexToDelete >= 0) {
       question.UsersAnswers.splice(indexToDelete, 1);
       this.emit('answerDeleted', question);
+    }
+  }
+
+  addQuestion(quest: QuestionInterface) {
+    if (!this.findQuestion(quest.id)) {
+      this.questions.push(quest)
+      this.emit('questionAdded', quest)
     }
   }
 
