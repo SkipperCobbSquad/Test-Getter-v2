@@ -132,7 +132,7 @@ function MasterDescShort(props: any) {
               <UserHolder>
                 <b title={a.username}>
                   {JSON.parse('' + sessionStorage.getItem('connection'))
-                    .username === a.username
+                    ?.username === a.username
                     ? 'Me'
                     : a.username.slice(0, 2)}
                   :{' '}
