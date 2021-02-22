@@ -88,7 +88,7 @@ class Getter extends EventEmitter {
       await this.emit('ready', new Test(mainTest, type))
       //End getting
       await browser.close();
-      // await this.clean();
+      await this.clean();
     } catch (error) {
       await browser.close();
       await this.clean();

@@ -34,8 +34,10 @@
     "eject": "react-scripts eject",
     "preelectron-dev": "tsc -p electron/tsconfig.json",
     "electron-dev": "concurrently -p \"[{name}]\" -n \"REACT,ELECTRON\" -c \"cyan.bold,green.bold\" \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "preelectron-pack": "npm run build",
-    "electron-pack": "electron-builder -l"
+    "preelectron-packl": "npm run build",
+    "electron-packl": "electron-builder -l",
+    "preelectron-packw": "npm run build",
+    "electron-packw": "electron-builder -w"
   },
   "eslintConfig": {
     "extends": [
@@ -78,6 +80,16 @@
       "target": [
         {
           "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
           "arch": [
             "x64"
           ]
