@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   HashRouter as Router,
   Switch,
@@ -20,7 +20,10 @@ import styled from 'styled-components';
 import './App.css';
 import '../icofont/icofont.min.css';
 
+const { ipcRenderer } = window.require('electron');
+
 const SwalBackToMenu = withReactContent(Swal);
+const ConnectionError = withReactContent(Swal);
 
 const MainDiv = styled.div`
   display: flex;
@@ -91,6 +94,22 @@ const BackToMenu = styled.div`
 
 function App() {
   const [location, setLocation] = useState(false);
+  useEffect(() => {
+    (async () => {
+      ipcRenderer.on('socketStatusError', (e: any, stat: any) => {
+        ConnectionError.fire({
+          icon: 'error',
+          title: 'Connecting Error',
+          text: 'Reason: ' + stat.reason,
+          didOpen: () => {
+            ConnectionError.hideLoading();
+          },
+        }).then(() => {
+          sessionStorage.removeItem('connection');
+        });
+      });
+    })();
+  }, []);
 
   const backToHome = () => {
     SwalBackToMenu.fire({
@@ -109,7 +128,7 @@ function App() {
     <MainDiv>
       <MenuDiv>
         <Router>
-        {location ? null : <Redirect to={`/#/`}></Redirect>}
+          {location ? null : <Redirect to={`/#/`}></Redirect>}
           <BarDiv style={{ display: location ? 'none' : 'flex' }}>
             <BarItem title="Home">
               <StyledLink to="/">
@@ -138,7 +157,12 @@ function App() {
             </BarItem>
             <BarItem title="Settings">
               <StyledLink to="/settings">
-                <i className="icofont-settings-alt icofont-3x"></i>
+                <i
+                  className="icofont-settings-alt icofont-3x"
+                  onClick={(e) => {
+                    setLocation(true);
+                  }}
+                ></i>
               </StyledLink>
             </BarItem>
           </BarDiv>

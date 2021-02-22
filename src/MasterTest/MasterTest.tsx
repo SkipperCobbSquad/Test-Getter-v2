@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import Question from './MasterQuestion';
 
+const { ipcRenderer } = window.require('electron');
 
 const MainDiv = styled.div`
   display: flex;
@@ -24,6 +26,12 @@ const MainDiv = styled.div`
 
 function MasterTest(props: any) {
   const test = props.test;
+  useEffect(() => {
+    return () => {
+      ipcRenderer.invoke('leave')
+      ipcRenderer.removeAllListeners('answerAdded', 'answerDeleted');
+    };
+  },[]);
   //TODO: This test is cleanTest() add ipc for listening new questions
   return (
     <MainDiv>

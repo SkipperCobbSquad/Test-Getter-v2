@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { CustomSocket, User, Call, ServerCallbacks, ServerReasons, TestInterface, UserAnswer } from './interfaces';
+import { CustomSocket, User, Call, ServerCallbacks, ServerReasons, TestInterface, UserAnswer, ServerMode } from './interfaces';
 
 const io = new Server();
 const users: Array<User> = [];
@@ -7,7 +7,7 @@ const Tests: Map<string, TestInterface> = new Map()
 const shortTests: Array<string> = []
 
 const chceckUser = (username: string, socketId: string): boolean => {
-    return users.find(u => (u.name === username) && (u.socketId === socketId)) ? true : false
+    return users.find(u => u.name === username) ? true : false
 }
 
 const testExist = (name): boolean => {
@@ -16,19 +16,21 @@ const testExist = (name): boolean => {
 
 io.on('connection', (socket: CustomSocket) => {
     console.log('con');
-    socket.on('setUsername', ((username: string, callback: CallableFunction) => {
+    socket.emit('serverMode', ServerMode.PUBLIC)
+    socket.on('login', ((username: string, callback: CallableFunction) => {
         if (chceckUser(username, socket.id)) {
             const res: Call = { status: ServerCallbacks.ERROR, reason: ServerReasons.USEREXIST }
             callback(res)
         } else {
             socket.username = username
             console.log(username);
+            users.push({ name: username, socketId: socket.id })
             const res: Call = { status: ServerCallbacks.OK }
             callback(res)
         }
     }))
 
-    socket.on('getTests', (callback: CallableFunction)=>{
+    socket.on('getTests', (callback: CallableFunction) => {
         callback(shortTests)
     })
 
@@ -37,7 +39,9 @@ io.on('connection', (socket: CustomSocket) => {
             const res: Call = { status: ServerCallbacks.ERROR, reason: ServerReasons.TESTEXIST }
             callback(res)
         } else {
-            const test: TestInterface = JSON.parse(rawTest)
+            const preTest: any = JSON.parse(rawTest)
+            preTest.users = 1
+            const test: TestInterface = preTest
             Tests.set(testName, test)
             shortTests.push(testName)
             socket.join(testName);
@@ -70,6 +74,21 @@ io.on('connection', (socket: CustomSocket) => {
             question.UsersAnswers.push(answer);
         }
         socket.to(testName).emit('addedAnswer', questID, rawAnswer)
+    })
+
+    socket.on('leave', () => {
+        shortTests.forEach(t => {
+            if (socket.rooms.has(t)) {
+                socket.leave(t)
+                const test = Tests.get(t)
+                test.users -= 1
+                if (test.users === 0) {
+                    Tests.delete(t)
+                    const findX = shortTests.findIndex((te) => te === t)
+                    shortTests.splice(findX, 1)
+                }
+            }
+        })
     })
 })
 

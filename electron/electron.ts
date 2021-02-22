@@ -1,12 +1,9 @@
-import { app, BrowserWindow, powerSaveBlocker, ipcMain, globalShortcut } from 'electron'
+import { app, BrowserWindow, powerSaveBlocker, globalShortcut } from 'electron'
 import * as isDev from 'electron-is-dev';
-import Router from './electroncore/api/Router';
-import { MultiRouter } from './electroncore/api/MultiRouter';
 import {MasterRouter} from './electroncore/api/MasterRouter';
 
 let idPowerSaveBolcker: any;
 let win: Electron.BrowserWindow | null;
-let ApiRouter: any
 let master: MasterRouter
 
 
@@ -35,6 +32,7 @@ function createWindow() {
 
 app.on('ready', () => {
     createWindow();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     master = new MasterRouter(win)
     // master.registerSocket('http://localhost:4000')
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
@@ -51,6 +49,7 @@ app.on('activate', () => {
 });
 
 app.on('will-quit', () => {
+    master.leave()
     globalShortcut.unregisterAll()
     powerSaveBlocker.stop(idPowerSaveBolcker);
 })

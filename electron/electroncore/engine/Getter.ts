@@ -42,8 +42,8 @@ class Getter extends EventEmitter {
       // defaultViewport: null
     });
     this.page = await browser.newPage();
-    await this.page.goto(url);
     try {
+      await this.page.goto(url);
       //Get testID
       this.testID = url.split('=')[1];
       //Login to test
@@ -88,12 +88,13 @@ class Getter extends EventEmitter {
       await this.emit('ready', new Test(mainTest, type))
       //End getting
       await browser.close();
-      await this.clean();
+      // await this.clean();
     } catch (error) {
       await browser.close();
       await this.clean();
       console.log(error.toString());
       await this.emit('status', error.toString());
+      await this.emit('error', error.toString())
     }
   }
 

@@ -1,4 +1,4 @@
-import { Server, Socket } from "socket.io";
+import {Socket } from "socket.io";
 
 export enum ServerCallbacks {
     OK = 'ok',
@@ -8,6 +8,11 @@ export enum ServerCallbacks {
 export enum ServerReasons {
     USEREXIST = "Username taken",
     TESTEXIST = "This test name exist"
+}
+
+export enum ServerMode {
+    PRIVATE = "PRIVATE",
+    PUBLIC = "PUBLIC"
 }
 
 export interface CustomSocket extends Socket {
@@ -57,6 +62,7 @@ export interface QuestionInterface {
 
 export interface TestInterface {
     id: string;
+    users: number
     numberOfQuestions: number;
     questions: Array<QuestionInterface>;
 }

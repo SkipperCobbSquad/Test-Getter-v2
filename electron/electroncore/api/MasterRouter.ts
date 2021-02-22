@@ -1,4 +1,4 @@
-import { BrowserWindow, IpcMain, ipcMain } from "electron";
+import { BrowserWindow, IpcMain, ipcMain, Notification } from "electron";
 import { io, Socket } from "socket.io-client";
 
 import { Test } from "../engine/Test";
@@ -44,24 +44,65 @@ export class MasterRouter {
             }
         })
 
-        ipcMain.handle('registerTest', (e: any, testURL: string, testName: string) => {
+        this.ipc.handle('tests', () => {
+            return new Promise((resolve, reject) => {
+                this.socket.emit('getTests', (tests: Array<String>) => {
+                    resolve(tests)
+                })
+            })
+        })
+
+        this.ipc.handle('JoinTest', (e: any, testName: string) => {
+            return new Promise((resolve, reject) => {
+                if (!this.socket) {
+                    reject('You are not connected')
+                }
+                this.socket.emit('JoinTest', testName, async (status: any) => {
+                    if (status.status === ServerCallbacks.OK) {
+                        this.mainTest = new Test(status.test)
+                        this.testName = testName;
+                        console.log(this.testName);
+                        this.multiTestTunel()
+                        resolve(ServerCallbacks.OK)
+                    } else {
+                        reject(status.reason)
+                    }
+                })
+            })
+        })
+
+        this.ipc.handle('registerTest', (e: any, testURL: string, testName: string) => {
             return new Promise((resolve, reject) => {
                 this.getterEngine.removeAllListeners();
-                this.getterEngine.getTest(testURL);
+                if (!((this.operatingMode === Mode.MULTI) && this.mainTest && testURL === 'cashe')) {
+                    this.getterEngine.getTest(testURL)
+                    //TODO: Make cashe backup :)
+                }
                 this.getterEngine.on('status', (status: string) => {
-                    console.log(status);
                     this.bWin.webContents.send('getter-status', status);
                 });
+                this.getterEngine.on('error', (err: string) => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const myNotification = new Notification({
+                        title: 'Error from Getter',
+                        body: err
+                    }).show()
+                    reject(err)
+                })
                 this.getterEngine.on('ready', (test: Test) => {
                     this.mainTest = test;
                     if (this.operatingMode === Mode.SINGLE) {
                         this.singleTestTunel()
                         resolve(ServerCallbacks.OK)
                     } else if (this.operatingMode === Mode.MULTI) {
+                        if (!this.socket) {
+                            reject('You are not connected')
+                        }
                         const rawTest: TestInterface = { id: test.ID, numberOfQuestions: test.numberOfQuestions, questions: test.questions }
                         this.socket.emit('registerTest', testName, JSON.stringify(rawTest), (status: PBCall | PVCall) => {
                             if (status.status === ServerCallbacks.OK) {
                                 this.testName = testName;
+                                this.multiTestTunel()
                                 resolve(ServerCallbacks.OK)
                             } else {
                                 reject(status.reason)
@@ -70,6 +111,10 @@ export class MasterRouter {
                     }
                 })
             })
+        })
+
+        this.ipc.handle('leave', () => {
+            this.leave()
         })
 
     }
@@ -81,7 +126,7 @@ export class MasterRouter {
                 this.socket.emit('login', uName, async (status: PBCall) => {
                     if (status.status === ServerCallbacks.OK) {
                         this.username = uName;
-                        resolve(ServerCallbacks.OK)
+                        resolve(uName)
                     } else {
                         reject(status.reason)
                     }
@@ -133,9 +178,38 @@ export class MasterRouter {
         })
     }
 
+    private multiTestTunel() {
+        this.ipc.removeHandler('answerAdded');
+        this.ipc.removeHandler('answerDeleted');
+        this.ipc.removeHandler('test');
+        this.ipc.removeAllListeners();
+
+        this.ipc.handle('test', async () => {
+            return this.mainTest.cleanTest();
+        })
+
+        this.ipc.handle('answerAdded', (e: any, answer: UserAnswer, questID: number) => {
+            console.log(answer);
+            const prepAnswer: UserAnswer = { username: this.username, answer: answer.answer }
+            this.mainTest.addAnswer(answer, questID)
+            this.socket.emit('addAnswer', this.testName, questID, JSON.stringify(prepAnswer))
+        })
+
+        this.mainTest.on('answerAdded', (q: QuestionInterface) => {
+            this.bWin.webContents.send('answerAdded', q)
+        })
+
+        this.socket.on('addedAnswer', (questID: string, rawAnswer: string) => {
+            const answer: UserAnswer = JSON.parse(rawAnswer)
+            this.mainTest.addAnswer(answer, +questID)
+        })
+    }
+
     registerSocket(URL: string) { //finaly some good fu*** food
         if (this.socket) {
-            this.socket.offAny()
+            // this.socket.offAny()
+            console.log('hello');
+            // this.socket.close()
             delete this.socket;
         }
         const o: any = { reconnection: false }
@@ -153,16 +227,22 @@ export class MasterRouter {
         })
 
         this.socket.on('disconnect', (reason: string) => {
-            this.bWin.webContents.send('socketStatus', { status: 'error', reason })
-            this.socketRegistered = false;
-            this.socket.offAny()
-            delete this.socket;
+            if (this.socket) {
+                this.bWin.webContents.send('socketStatus', { status: 'error', reason })
+                this.bWin.webContents.send('socketStatusError', { status: 'error', reason })
+                this.socketRegistered = false;
+                console.log('hello1');
+                this.socket.close()
+                delete this.socket;
+            }
         })
 
         this.socket.on('connect_error', (error: any) => {
             this.bWin.webContents.send('socketStatus', { status: 'error', reason: 'connect_error' })
+            this.bWin.webContents.send('socketStatusError', { status: 'error', reason: 'connect_error' })
             this.socketRegistered = false;
-            this.socket.offAny()
+            console.log('hello2');
+            this.socket.close()
             delete this.socket;
         });
 
@@ -172,6 +252,12 @@ export class MasterRouter {
                 this.mainTest.addAnswer(answer, +questID)
             }
         })
+    }
+
+    leave() {
+        if (this.socket) {
+            this.socket.emit('leave')
+        }
     }
 
 }

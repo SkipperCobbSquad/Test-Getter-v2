@@ -34,14 +34,17 @@ function MasterMulti(props: SingleMulti) {
   }
 
   const submmitAnswer = () => {
+    const uname: string = sessionStorage.getItem('connection')
+    ? JSON.parse('' + sessionStorage.getItem('connection')).username
+    : 'Me';
     if (answers.length) {
       ipcRenderer.invoke(
         'answerAdded',
-        { username: 'Me', answer: answers },
+        { username: uname, answer: answers },
         props.guestionId
       );
     } else {
-      ipcRenderer.invoke('answerDeleted', 'Me', props.guestionId);
+      ipcRenderer.invoke('answerDeleted', uname, props.guestionId);
     }
   };
 

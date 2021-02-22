@@ -50,14 +50,17 @@ function MasterSingle(props: SingleMulti) {
   }
 
   const submmitAnswer = () => {
+    const uname: string = sessionStorage.getItem('connection')
+      ? JSON.parse('' + sessionStorage.getItem('connection')).username
+      : 'Me';
     if (answers.length) {
       ipcRenderer.invoke(
         'answerAdded',
-        { username: 'Me', answer: answers },
+        { username: uname, answer: answers },
         props.guestionId
       );
     } else {
-      ipcRenderer.invoke('answerDeleted', 'Me', props.guestionId);
+      ipcRenderer.invoke('answerDeleted', uname, props.guestionId);
     }
   };
 
@@ -65,11 +68,11 @@ function MasterSingle(props: SingleMulti) {
     const update: any = answers;
     if (answers.length) {
       const findX = answers.findIndex((a: any) => a.id === answer.id);
-      if(findX >= 0){
-        update.splice(0, 1)
-      }else{
+      if (findX >= 0) {
+        update.splice(0, 1);
+      } else {
         update.splice(0, 1, answer);
-      } 
+      }
     } else {
       update.push(answer);
     }

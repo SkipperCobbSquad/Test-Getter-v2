@@ -52,7 +52,6 @@ function MasterQuestion(props: any) {
         }
       );
     })();
-    return ()=>{ipcRenderer.removeAllListeners()}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

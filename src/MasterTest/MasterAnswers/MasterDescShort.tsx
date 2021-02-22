@@ -109,10 +109,13 @@ function MasterDescShort(props: any) {
   const [input, setInput] = useState('');
   const answers: Array<UserAnswer> = props.UserAnswers;
   const submmitAnswer = () => {
+    const uname: string = sessionStorage.getItem('connection')
+      ? JSON.parse('' + sessionStorage.getItem('connection')).username
+      : 'Me';
     if (input.length) {
       ipcRenderer.invoke(
         'answerAdded',
-        { username: 'Me', answer: [input] },
+        { username: uname, answer: [input] },
         props.guestionId
       );
       setAnswered(true);
@@ -127,7 +130,13 @@ function MasterDescShort(props: any) {
           return (
             <AnswerHolder key={a.username}>
               <UserHolder>
-                <b title={a.username}>{a.username.slice(0, 2)}: </b>
+                <b title={a.username}>
+                  {JSON.parse('' + sessionStorage.getItem('connection'))
+                    .username === a.username
+                    ? 'Me'
+                    : a.username.slice(0, 2)}
+                  :{' '}
+                </b>
               </UserHolder>
               <StyledAnswerText>{a.answer}</StyledAnswerText>
             </AnswerHolder>

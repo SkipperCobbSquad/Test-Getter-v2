@@ -54,6 +54,7 @@ export class Test extends EventEmitter {
 
   addQuestion(quest: QuestionInterface) {
     if (!this.findQuestion(quest.id)) {
+      this.numberOfQuestions += 1
       this.questions.push(quest)
       this.emit('questionAdded', quest)
     }
