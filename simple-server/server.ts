@@ -55,7 +55,9 @@ io.on('connection', (socket: CustomSocket) => {
         if (testExist(testName)) {
             socket.join(testName)
             const test = Tests.get(testName)
-            callback({ status: ServerCallbacks.OK, test: test })
+            test.users += 1;
+            const callTest = { id: test.id, numberOfQuestions: test.numberOfQuestions, questions: test.questions }
+            callback({ status: ServerCallbacks.OK, test: callTest })
         } else {
             const res: Call = { status: ServerCallbacks.ERROR, reason: ServerReasons.TESTEXIST }
             callback(res)

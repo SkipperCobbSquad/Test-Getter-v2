@@ -49,31 +49,10 @@ app.on('activate', () => {
 });
 
 app.on('will-quit', () => {
-    master.leave()
     globalShortcut.unregisterAll()
     powerSaveBlocker.stop(idPowerSaveBolcker);
 })
 
 app.on('quit', () => {
+    master.leave()
 });
-
-// ipcMain.handle('single', () => {
-//     ApiRouter = null;
-//     ApiRouter = new Router(win)
-// })
-
-// ipcMain.handle('multi', (e: any, url: string) => {
-//     ApiRouter = null;
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     return new Promise((resolve, reject) => {
-//         ApiRouter = new MultiRouter(win, url)
-//         ApiRouter.on('ready', () => {
-//             resolve(null)
-//         })
-//     })
-// })
-
-// ipcMain.handle('leave', (e: any) => {
-//     ApiRouter.leave()
-//     ApiRouter = null;
-// })

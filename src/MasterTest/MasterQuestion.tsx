@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { QuestionInterface, QuestionType } from '../helpers/testInterfaces';
@@ -7,7 +7,7 @@ import DescShrot from './MasterAnswers/MasterDescShort';
 import Multi from './MasterAnswers/MasterMulti';
 import Single from './MasterAnswers/MasterSingle';
 
-const  ipcRenderer  = window.require('electron').ipcRenderer.setMaxListeners(0)
+const ipcRenderer = window.require('electron').ipcRenderer.setMaxListeners(0);
 
 const QuestDiv = styled.div`
   display: flex;
@@ -32,7 +32,9 @@ const QuestPTop: any = styled.p`
 
 function MasterQuestion(props: any) {
   const qR: QuestionInterface = props.quest;
+  const MasterQest = useRef<HTMLDivElement>(null);
   const [q, setQ] = useState(qR);
+  console.log(q.id);
   useEffect(() => {
     (async () => {
       await ipcRenderer.on(
@@ -51,22 +53,50 @@ function MasterQuestion(props: any) {
           }
         }
       );
+
+      await ipcRenderer.on('focus', (e: any, id: number) => {
+        if (q.id === id) {
+          MasterQest?.current?.scrollIntoView()
+        }
+      });
     })();
+    // return ()=>{ipcRenderer.removeAllListeners('answerAdded', 'answerDeleted'); console.log('Here1');}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const answerPicker = (type: QuestionType) => {
-    if (type === QuestionType.DESCRIPTIVE || type === QuestionType.SHORT_ANSWER) {
-      return <DescShrot qType={type} guestionId={q.id} UserAnswers={q.UsersAnswers}></DescShrot>;
-    }else if(type === QuestionType.MULTI_ANSWER){
-      return <Multi guestionId={q.id} answers={q.answers}  UserAnswers={q.UsersAnswers}></Multi>
-    }else{
-      return <Single guestionId={q.id} answers={q.answers}  UserAnswers={q.UsersAnswers}></Single>
+    if (
+      type === QuestionType.DESCRIPTIVE ||
+      type === QuestionType.SHORT_ANSWER
+    ) {
+      return (
+        <DescShrot
+          qType={type}
+          guestionId={q.id}
+          UserAnswers={q.UsersAnswers}
+        ></DescShrot>
+      );
+    } else if (type === QuestionType.MULTI_ANSWER) {
+      return (
+        <Multi
+          guestionId={q.id}
+          answers={q.answers}
+          UserAnswers={q.UsersAnswers}
+        ></Multi>
+      );
+    } else {
+      return (
+        <Single
+          guestionId={q.id}
+          answers={q.answers}
+          UserAnswers={q.UsersAnswers}
+        ></Single>
+      );
     }
   };
 
   return (
-    <QuestDiv>
+    <QuestDiv ref={MasterQest}>
       <QuestTop>
         <QuestPTop>{q.question}</QuestPTop>
         <QuestPTop qType>Question type: {q.type}</QuestPTop>

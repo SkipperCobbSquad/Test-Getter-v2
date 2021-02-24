@@ -15,7 +15,8 @@ export enum ServerCallbacks {
 
 export enum ServerReasons {
     USEREXIST = "Username taken",
-    TESTEXIST = "This test name exist"
+    TESTEXIST = "This test name exist",
+    APIKEYINVALID = "This api key is invalid"
 }
 
 export interface PBCall {

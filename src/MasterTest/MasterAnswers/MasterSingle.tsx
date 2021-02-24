@@ -47,6 +47,7 @@ function MasterSingle(props: SingleMulti) {
       }
     });
     Collection.push({ answer, users });
+    console.log(answer);
   }
 
   const submmitAnswer = () => {

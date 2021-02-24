@@ -1,6 +1,8 @@
+import { writeFile} from 'fs';
 import { BrowserWindow, IpcMain, ipcMain, Notification } from "electron";
 import { io, Socket } from "socket.io-client";
 
+import { LiveFire } from '../engine/LiveFire';
 import { Test } from "../engine/Test";
 import Getter from "../engine/Getter";
 
@@ -9,6 +11,7 @@ import { PBCall, Mode, ServerCallbacks, ServerMode, PVCall } from '../helpers/ro
 
 export class MasterRouter {
     getterEngine: Getter;
+    LiveFireEngine: LiveFire
     bWin: BrowserWindow;
     ipc: IpcMain
     mainTest: Test;
@@ -24,6 +27,7 @@ export class MasterRouter {
         this.bWin = window;
         this.socketRegistered = false;
         this.getterEngine = new Getter()
+        this.LiveFireEngine = new LiveFire()
 
         this.ipc.handle('mode', (e: any, mode: Mode) => {
             this.operatingMode = mode;
@@ -113,6 +117,27 @@ export class MasterRouter {
             })
         })
 
+        this.ipc.handle('exporTest', (e: any) => {
+            if (this.mainTest) {
+                const raw: String = JSON.stringify(this.mainTest, null, 4);
+                writeFile(`test-${this.testName}.json`, raw, (err) => {
+                    if (err) {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const error = new Notification({
+                            title: 'Error from Export',
+                            body: err.toString()
+                        }).show()
+                    } else {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const saved = new Notification({
+                            title: 'Test Exported',
+                            body: 'Test Exported'
+                        }).show()
+                    }
+                })
+            }
+        })
+
         this.ipc.handle('leave', () => {
             this.leave()
         })
@@ -176,6 +201,8 @@ export class MasterRouter {
         this.mainTest.on('answerDeleted', (q: QuestionInterface) => {
             this.bWin.webContents.send('answerDeleted', q)
         })
+
+        this.registerLiveFire();
     }
 
     private multiTestTunel() {
@@ -202,6 +229,19 @@ export class MasterRouter {
         this.socket.on('addedAnswer', (questID: string, rawAnswer: string) => {
             const answer: UserAnswer = JSON.parse(rawAnswer)
             this.mainTest.addAnswer(answer, +questID)
+        })
+
+        this.registerLiveFire();
+    }
+
+    private registerLiveFire() {
+        this.LiveFireEngine.on('quest', (id: string, raw: string) => {
+            if (this.LiveFireEngine.testId === this.mainTest.ID) {
+                const quest = this.mainTest.questions.find(q => q.answers.find(a => a.id === +id))
+                if (quest?.id) {
+                    this.bWin.webContents.send('focus', quest.id)
+                }
+            }
         })
     }
 
@@ -258,6 +298,7 @@ export class MasterRouter {
         if (this.socket) {
             this.socket.emit('leave')
         }
+        this.LiveFireEngine.removeAllListeners();
     }
 
 }

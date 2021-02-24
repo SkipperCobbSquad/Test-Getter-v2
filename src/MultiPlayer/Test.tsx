@@ -39,7 +39,7 @@ const Export = styled.button`
   padding: 5px 15px;
   border: 5px solid #0096c7;
   border-radius: 10px;
-  cursor: not-allowed;
+  cursor: pointer;
   text-decoration: none;
   outline: none;
   &:hover {
@@ -71,7 +71,11 @@ function Test() {
                 Back To Lobby
               </b>
             </Lobby>
-            <Export>
+            <Export
+              onClick={() => {
+                ipcRenderer.invoke('exporTest');
+              }}
+            >
               <b>Export Test</b>
             </Export>
           </Holder>

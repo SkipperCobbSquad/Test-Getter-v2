@@ -191,9 +191,18 @@ function Multi() {
           ready={joinTo.length ? true : false}
           onClick={() => {
             if (joinTo.length) {
-              ipcRenderer.invoke('JoinTest', joinTo).then(() => {
-                setReady(true);
-              });
+              ipcRenderer
+                .invoke('JoinTest', joinTo)
+                .then(() => {
+                  setReady(true);
+                })
+                .catch((err: string) => {
+                  status.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err,
+                  });
+                });
             }
           }}
         >
