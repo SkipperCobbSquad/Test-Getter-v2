@@ -68,10 +68,9 @@ class Getter extends EventEmitter {
         );
         this.listOfQuestions.push(quest);
         console.log(quest);
-        await this.emit('status', `Getting ${i}/${this.numberQuest}`)
+        await this.emit('status', `Getting ${i}/${this.numberQuest}`);
         if (quest.isRequired) {
-          console.log('FUCK');
-          //TODO: Requierer.ts <- to randomly resolve question
+          await this.requierer(quest)
         }
         //Go to next question
         await this.page.click('.test_button_box .mdc-button');
@@ -85,7 +84,7 @@ class Getter extends EventEmitter {
       //Send status of creation
       await this.emit('status', 'ready');
       //Send created Test
-      await this.emit('ready', new Test(mainTest, type))
+      await this.emit('ready', new Test(mainTest, type));
       //End getting
       await browser.close();
       await this.clean();
@@ -94,7 +93,7 @@ class Getter extends EventEmitter {
       await this.clean();
       console.log(error.toString());
       await this.emit('status', error.toString());
-      await this.emit('error', error.toString())
+      await this.emit('error', error.toString());
     }
   }
 
@@ -181,6 +180,28 @@ class Getter extends EventEmitter {
       UsersAnswers: [],
     };
     return cleanQuest;
+  }
+  private async requierer(quest: QuestionInterface) {
+    if (quest.type === QuestionType.DESCRIPTIVE) {
+      await this.page.waitForSelector('iframe');
+      await this.page.waitForTimeout(2000);
+      await this.page.evaluate(() => {
+        const ifr: any = document.querySelector('iframe')
+        ifr.contentWindow.document.querySelector('p').innerText = '          '
+        return 0
+      });
+    } else if (quest.type === QuestionType.SHORT_ANSWER) {
+      await this.page.click('.mdc-card__action')
+      await this.page.type('.form_input', '          ')
+    } else if (
+      quest.type === QuestionType.SINGLE_ANSWER ||
+      quest.type === QuestionType.TRUE_FALSE ||
+      quest.type === QuestionType.SURVEY
+    ) {
+      await this.page.click('.selection_field');
+    } else if (quest.type === QuestionType.MULTI_ANSWER) {
+      await this.page.click('.mdc-checkbox__native-control');
+    }
   }
 }
 
