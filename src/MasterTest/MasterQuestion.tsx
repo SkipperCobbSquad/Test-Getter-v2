@@ -7,6 +7,7 @@ import DescShrot from './MasterAnswers/MasterDescShort';
 import Multi from './MasterAnswers/MasterMulti';
 import Single from './MasterAnswers/MasterSingle';
 
+const Latex: any = require('react-latex');
 const ipcRenderer = window.require('electron').ipcRenderer.setMaxListeners(0);
 
 const QuestDiv = styled.div`
@@ -34,7 +35,6 @@ function MasterQuestion(props: any) {
   const qR: QuestionInterface = props.quest;
   const MasterQest = useRef<HTMLDivElement>(null);
   const [q, setQ] = useState(qR);
-  console.log(q.id);
   useEffect(() => {
     (async () => {
       await ipcRenderer.on(
@@ -56,7 +56,7 @@ function MasterQuestion(props: any) {
 
       await ipcRenderer.on('focus', (e: any, id: number) => {
         if (q.id === id) {
-          MasterQest?.current?.scrollIntoView()
+          MasterQest?.current?.scrollIntoView();
         }
       });
     })();
@@ -82,6 +82,7 @@ function MasterQuestion(props: any) {
           guestionId={q.id}
           answers={q.answers}
           UserAnswers={q.UsersAnswers}
+          latex={q.hasLatex}
         ></Multi>
       );
     } else {
@@ -90,6 +91,7 @@ function MasterQuestion(props: any) {
           guestionId={q.id}
           answers={q.answers}
           UserAnswers={q.UsersAnswers}
+          latex={q.hasLatex}
         ></Single>
       );
     }
@@ -98,7 +100,9 @@ function MasterQuestion(props: any) {
   return (
     <QuestDiv ref={MasterQest}>
       <QuestTop>
-        <QuestPTop>{q.question}</QuestPTop>
+        <QuestPTop>
+          {q.hasLatex ? <Latex>{q.question}</Latex> : q.question}
+        </QuestPTop>
         <QuestPTop qType>Question type: {q.type}</QuestPTop>
       </QuestTop>
       {answerPicker(q.type)}

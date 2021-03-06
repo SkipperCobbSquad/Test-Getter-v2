@@ -3,6 +3,7 @@ export interface SingleMulti {
   guestionId: number;
   answers: Array<AnswerInterface>;
   UserAnswers: Array<UserAnswer>;
+  latex: boolean;
 }
 
 export interface CollectingAnswers {

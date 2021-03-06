@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { AnswerInterface } from '../../helpers/testInterfaces';
 import { CollectingAnswers, SingleMulti } from '../../helpers/ReactInterfaces';
 
+const Latex: any = require('react-latex');
 const { ipcRenderer } = window.require('electron');
 
 const AnswersHolder = styled.div`
@@ -47,7 +48,6 @@ function MasterSingle(props: SingleMulti) {
       }
     });
     Collection.push({ answer, users });
-    console.log(answer);
   }
 
   const submmitAnswer = () => {
@@ -79,7 +79,6 @@ function MasterSingle(props: SingleMulti) {
     }
     setAnswers(update);
     submmitAnswer();
-    console.log(update);
   };
   return (
     <AnswersHolder>
@@ -91,7 +90,13 @@ function MasterSingle(props: SingleMulti) {
             chandleChange(a.answer);
           }}
         >
-          <AnswerPHolder>{a.answer.description}</AnswerPHolder>
+          <AnswerPHolder>
+            {props.latex ? (
+              <Latex>{a.answer.description}</Latex>
+            ) : (
+              a.answer.description
+            )}
+          </AnswerPHolder>
           <UserHolder>{a.users.length}</UserHolder>
         </AnswerDiv>
       ))}

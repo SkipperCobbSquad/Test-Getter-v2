@@ -19,6 +19,7 @@ import styled from 'styled-components';
 
 import './App.css';
 import '../icofont/icofont.min.css';
+import 'katex/dist/katex.min.css';
 
 const { ipcRenderer } = window.require('electron');
 

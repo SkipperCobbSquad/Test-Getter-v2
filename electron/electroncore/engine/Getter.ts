@@ -70,7 +70,7 @@ class Getter extends EventEmitter {
         console.log(quest);
         await this.emit('status', `Getting ${i}/${this.numberQuest}`);
         if (quest.isRequired) {
-          await this.requierer(quest)
+          await this.requierer(quest);
         }
         //Go to next question
         await this.page.click('.test_button_box .mdc-button');
@@ -131,13 +131,20 @@ class Getter extends EventEmitter {
   private scrap(raw: Array<any>): QuestionInterface {
     const ID: number = +raw[0].value;
     const questType: QuestionType = raw[1].value;
-    let required: boolean = false;
-    if (raw[2].querySelector('.mandatory_question')) {
-      required = true;
-    }
+    let required: boolean = raw[2].querySelector('.mandatory_question') ? true : false
+    let detectLatex: boolean =
+      raw[4].querySelector('.rendered-latex') ||
+        raw[3].querySelector('.rendered-latex')
+        ? true
+        : false;
+
     const rawQuest: Array<string> = [];
     raw[3].querySelectorAll('p').forEach((q: HTMLParagraphElement) => {
-      rawQuest.push(q.textContent);
+      if (detectLatex) {
+        rawQuest.push(...this.getLatex(q));
+      } else {
+        rawQuest.push(q.textContent);
+      }
     });
     const mainQuest: string = rawQuest.join(' ');
 
@@ -159,9 +166,12 @@ class Getter extends EventEmitter {
           .getAttribute('for')
           .split('_')[1];
         a.querySelectorAll('p').forEach((p: HTMLParagraphElement) => {
-          preRenderAnswer.push(p.textContent);
+          if (detectLatex) {
+            preRenderAnswer.push(this.getLatex(p).join(''));
+          } else {
+            preRenderAnswer.push(p.textContent);
+          }
         });
-        //TODO: LateX detector for math equations
         const answer: AnswerInterface = {
           id: answerID,
           description: preRenderAnswer.join(' '),
@@ -176,23 +186,35 @@ class Getter extends EventEmitter {
       isRequired: required,
       question: mainQuest,
       answers: mainAnswer,
-      hasLatex: false,
+      hasLatex: detectLatex,
       UsersAnswers: [],
     };
     return cleanQuest;
+  }
+  private getLatex(par: HTMLParagraphElement): Array<string> {
+    const m = Array.from(par.childNodes)
+    const w: Array<string> = []
+    m.forEach((t: any) => {
+      if (t.children) {
+        w.push(t.children[0].textContent)
+      } else {
+        w.push(t.textContent)
+      }
+    })
+    return w
   }
   private async requierer(quest: QuestionInterface) {
     if (quest.type === QuestionType.DESCRIPTIVE) {
       await this.page.waitForSelector('iframe');
       await this.page.waitForTimeout(2000);
       await this.page.evaluate(() => {
-        const ifr: any = document.querySelector('iframe')
-        ifr.contentWindow.document.querySelector('p').innerText = '          '
-        return 0
+        const ifr: any = document.querySelector('iframe');
+        ifr.contentWindow.document.querySelector('p').innerText = '          ';
+        return 0;
       });
     } else if (quest.type === QuestionType.SHORT_ANSWER) {
-      await this.page.click('.mdc-card__action')
-      await this.page.type('.form_input', '          ')
+      await this.page.click('.mdc-card__action');
+      await this.page.type('.form_input', '          ');
     } else if (
       quest.type === QuestionType.SINGLE_ANSWER ||
       quest.type === QuestionType.TRUE_FALSE ||
@@ -206,3 +228,20 @@ class Getter extends EventEmitter {
 }
 
 export default Getter;
+
+// get=function(node){
+//   let res=""
+//   for(const child of node.childNodes){
+//       if(child.nodeType==3){
+//           res+=child.textContent
+//       }
+//       else if(child.classList.indexOf("rendered-latex")){ //tu
+//           res+=child.childern[0].textContent
+//       }
+//       else{
+//           res+=get(child)    
+//       }
+
+//   }
+//   return res 
+// }

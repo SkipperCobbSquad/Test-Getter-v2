@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
+const Latex: any = require('react-latex');
+
 const AnswerDiv: any = styled.div`
   display: flex;
   background: #ffc8dd;
@@ -29,7 +31,13 @@ function MasterAnswerHolder(props: any) {
         props.handler(props.answer.answer);
       }}
     >
-      <AnswerPHolder>{props.answer.answer.description}</AnswerPHolder>
+      <AnswerPHolder>
+        {props.latex ? (
+          <Latex>{props.answer.answer.description}</Latex>
+        ) : (
+          props.answer.answer.description
+        )}
+      </AnswerPHolder>
       <UserHolder>{props.answer.users.length}</UserHolder>
     </AnswerDiv>
   );

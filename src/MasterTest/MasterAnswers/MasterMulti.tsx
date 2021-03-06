@@ -75,6 +75,7 @@ function MasterMulti(props: SingleMulti) {
             key={a.answer.id}
             handler={chandleChange}
             chceck={answers}
+            latex={props.latex}
           ></AnswerDiv>
         ))}
       </AnswersHolder>
