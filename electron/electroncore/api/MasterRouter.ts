@@ -1,6 +1,7 @@
-import { writeFile} from 'fs';
+import { writeFile } from 'fs';
 import { BrowserWindow, IpcMain, ipcMain, Notification } from "electron";
 import { io, Socket } from "socket.io-client";
+import { JSDOM } from 'jsdom';
 
 import { LiveFire } from '../engine/LiveFire';
 import { Test } from "../engine/Test";
@@ -180,10 +181,6 @@ export class MasterRouter {
     }
 
     private singleTestTunel() {
-        this.ipc.removeHandler('answerAdded');
-        this.ipc.removeHandler('answerDeleted');
-        this.ipc.removeHandler('test');
-        this.ipc.removeAllListeners();
 
         this.ipc.handle('test', async () => {
             return this.mainTest.cleanTest();
@@ -206,10 +203,6 @@ export class MasterRouter {
     }
 
     private multiTestTunel() {
-        this.ipc.removeHandler('answerAdded');
-        this.ipc.removeHandler('answerDeleted');
-        this.ipc.removeHandler('test');
-        this.ipc.removeAllListeners();
 
         this.ipc.handle('test', async () => {
             return this.mainTest.cleanTest();
@@ -235,11 +228,19 @@ export class MasterRouter {
     }
 
     private registerLiveFire() {
-        this.LiveFireEngine.on('quest', (id: string, raw: string) => {
+        this.LiveFireEngine.on('quest', (raw: string) => {
             if (this.LiveFireEngine.testId === this.mainTest.ID) {
-                const quest = this.mainTest.questions.find(q => q.answers.find(a => a.id === +id))
-                if (quest?.id) {
+                const rawQuest: any = new JSDOM(raw);
+                const quest: QuestionInterface = this.getterEngine.scrap(
+                    Array.from(
+                        rawQuest.window.document.querySelector('.question-container')
+                            .children
+                    )
+                );
+                if (this.mainTest.questions.find(q => q.id === quest.id)) {
                     this.bWin.webContents.send('focus', quest.id)
+                } else {
+                    //TODO: Add question to test
                 }
             }
         })
@@ -298,6 +299,12 @@ export class MasterRouter {
         if (this.socket) {
             this.socket.emit('leave')
         }
+
+        this.ipc.removeHandler('answerAdded');
+        this.ipc.removeHandler('answerDeleted');
+        this.ipc.removeHandler('test');
+        this.ipc.removeAllListeners();
+
         this.LiveFireEngine.removeAllListeners();
     }
 

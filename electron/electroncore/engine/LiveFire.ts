@@ -18,8 +18,8 @@ export class LiveFire extends EventEmitter {
                 this.testId = id;
             })
 
-            socket.on('quest', (id: string, raw: string) => {
-                this.emit('quest', id, raw)
+            socket.on('quest', (raw: string) => {
+                this.emit('quest', raw)
             })
         })
 

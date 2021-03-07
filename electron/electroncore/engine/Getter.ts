@@ -128,8 +128,7 @@ class Getter extends EventEmitter {
       () => document.querySelector('.question-area').innerHTML
     );
   }
-  private scrap(raw: Array<any>): QuestionInterface {
-    const ID: number = +raw[0].value;
+  scrap(raw: Array<any>): QuestionInterface {
     const questType: QuestionType = raw[1].value;
     let required: boolean = raw[2].querySelector('.mandatory_question') ? true : false
     let detectLatex: boolean =
@@ -147,6 +146,9 @@ class Getter extends EventEmitter {
       }
     });
     const mainQuest: string = rawQuest.join(' ');
+
+    //Create hash from quest
+    const ID: number = this.generateHash(mainQuest)
 
     const mainAnswer: Array<AnswerInterface> = [];
     const rawTableAnswers: Array<any> = Array.from(
@@ -191,6 +193,18 @@ class Getter extends EventEmitter {
     };
     return cleanQuest;
   }
+  private generateHash(toHash: string): number {
+    let hash = 0;
+    if (toHash.length === 0) {
+      return hash;
+    }
+    for (let i = 0; i < toHash.length; i++) {
+      const char = toHash.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  }
   private getLatex(par: HTMLParagraphElement): Array<string> {
     const m = Array.from(par.childNodes)
     const w: Array<string> = []
@@ -208,7 +222,7 @@ class Getter extends EventEmitter {
       await this.page.waitForSelector('iframe');
       await this.page.waitForTimeout(2000);
       await this.page.evaluate(() => {
-        const ifr: any = document.querySelector('iframe');
+        const ifr: any = document.querySelector('#givenAnswer_ifr');
         ifr.contentWindow.document.querySelector('p').innerText = '          ';
         return 0;
       });
