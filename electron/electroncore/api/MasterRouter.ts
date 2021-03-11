@@ -191,12 +191,19 @@ export class MasterRouter {
         })
         this.mainTest.on('answerAdded', (q: QuestionInterface) => {
             this.bWin.webContents.send('answerAdded', q)
+            if ((this.LiveFireEngine.currentQuest === q.id) && (this.LiveFireEngine.testId === this.mainTest.ID)) {
+                this.LiveFireEngine.answer(q.UsersAnswers)
+            }
         })
         this.ipc.handle('answerDeleted', (e: any, username: string, questID: number) => {
             this.mainTest.removeAnswer(username, questID)
         })
         this.mainTest.on('answerDeleted', (q: QuestionInterface) => {
             this.bWin.webContents.send('answerDeleted', q)
+        })
+
+        this.mainTest.on('questionAdded', (quest: QuestionInterface) => {
+            this.bWin.webContents.send('questionAdded', quest)
         })
 
         this.registerLiveFire();
@@ -217,11 +224,19 @@ export class MasterRouter {
 
         this.mainTest.on('answerAdded', (q: QuestionInterface) => {
             this.bWin.webContents.send('answerAdded', q)
+            if ((this.LiveFireEngine.currentQuest === q.id) && (this.LiveFireEngine.testId === this.mainTest.ID)) {
+                this.LiveFireEngine.answer(q.UsersAnswers)
+            }
         })
 
         this.socket.on('addedAnswer', (questID: string, rawAnswer: string) => {
             const answer: UserAnswer = JSON.parse(rawAnswer)
             this.mainTest.addAnswer(answer, +questID)
+        })
+
+        this.mainTest.on('questionAdded', (quest: QuestionInterface) => {
+            this.bWin.webContents.send('questionAdded', quest)
+            this.socket.emit('questionAdded',this.testName, quest)
         })
 
         this.registerLiveFire();
@@ -237,9 +252,13 @@ export class MasterRouter {
                             .children
                     )
                 );
-                if (this.mainTest.questions.find(q => q.id === quest.id)) {
+                this.LiveFireEngine.currentQuest = quest.id
+                const mainTestQuest = this.mainTest.questions.find(q => q.id === quest.id)
+                if (mainTestQuest) {
                     this.bWin.webContents.send('focus', quest.id)
+                    this.LiveFireEngine.answer(mainTestQuest.UsersAnswers)
                 } else {
+                    this.mainTest.addQuestion(quest)
                     //TODO: Add question to test
                 }
             }
@@ -293,6 +312,14 @@ export class MasterRouter {
                 this.mainTest.addAnswer(answer, +questID)
             }
         })
+        this.socket.on('addedQuestion', (rawQuest: string) => {
+            if (this.mainTest) {
+                console.log(rawQuest);
+                const question: QuestionInterface = JSON.parse(rawQuest)
+                this.mainTest.addQuestion(question)
+            }
+        })
+
     }
 
     leave() {

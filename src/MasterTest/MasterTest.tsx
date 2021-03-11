@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import Question from './MasterQuestion';
@@ -25,12 +25,20 @@ const MainDiv = styled.div`
 `;
 
 function MasterTest(props: any) {
-  const test = props.test;
+  // const test = props.test;
+  const [test, setTest] = useState(props.test)
   useEffect(() => {
+    (async ()=>{
+      await ipcRenderer.on('questionAdded', (e:any, quest: any)=>{
+         const update = test.questions.push(quest)
+         setTest(update)
+      })
+    })()
     return () => {
       ipcRenderer.invoke('leave')
       ipcRenderer.removeAllListeners('answerAdded', 'answerDeleted');
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
   //TODO: This test is cleanTest() add ipc for listening new questions
   return (

@@ -223,7 +223,7 @@ class Getter extends EventEmitter {
       await this.page.waitForTimeout(2000);
       await this.page.evaluate(() => {
         const ifr: any = document.querySelector('#givenAnswer_ifr');
-        ifr.contentWindow.document.querySelector('p').innerText = '          ';
+        ifr.contentWindow.document.querySelector('p').innerText = 'Error: Cant`t read value of null';
         return 0;
       });
     } else if (quest.type === QuestionType.SHORT_ANSWER) {
