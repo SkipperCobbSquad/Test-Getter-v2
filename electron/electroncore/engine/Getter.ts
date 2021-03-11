@@ -28,7 +28,7 @@ class Getter extends EventEmitter {
     this.listOfQuestions = [];
     if (this.os === 'win32') {
       this.pathToChrome =
-        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
+        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
     } else {
       this.pathToChrome = 'google-chrome';
     }
