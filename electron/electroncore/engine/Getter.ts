@@ -138,7 +138,7 @@ class Getter extends EventEmitter {
         : false;
 
     const rawQuest: Array<string> = [];
-    raw[3].querySelectorAll('p').forEach((q: HTMLParagraphElement) => {
+    Array.from(raw[3].children).forEach((q: any) => {
       if (detectLatex) {
         rawQuest.push(...this.getLatex(q));
       } else {

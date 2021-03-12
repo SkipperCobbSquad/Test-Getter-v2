@@ -82,6 +82,7 @@ export class MasterRouter {
                 if (!((this.operatingMode === Mode.MULTI) && this.mainTest && testURL === 'cashe')) {
                     this.getterEngine.getTest(testURL)
                     //TODO: Make cashe backup :)
+                    //TODO: Register live fire session
                 }
                 this.getterEngine.on('status', (status: string) => {
                     this.bWin.webContents.send('getter-status', status);
@@ -203,7 +204,7 @@ export class MasterRouter {
         })
 
         this.mainTest.on('questionAdded', (quest: QuestionInterface) => {
-            this.bWin.webContents.send('questionAdded', quest)
+            this.bWin.webContents.send('questionAdded', this.mainTest.cleanTest())
         })
 
         this.registerLiveFire();
@@ -235,8 +236,9 @@ export class MasterRouter {
         })
 
         this.mainTest.on('questionAdded', (quest: QuestionInterface) => {
-            this.bWin.webContents.send('questionAdded', quest)
+            this.bWin.webContents.send('questionAdded', this.mainTest.cleanTest())
             this.socket.emit('questionAdded',this.testName, quest)
+            console.log(quest);
         })
 
         this.registerLiveFire();
@@ -336,4 +338,3 @@ export class MasterRouter {
     }
 
 }
-//TODO combine two routers

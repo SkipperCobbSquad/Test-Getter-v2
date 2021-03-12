@@ -26,21 +26,21 @@ const MainDiv = styled.div`
 
 function MasterTest(props: any) {
   // const test = props.test;
+  // const questions = props.test.questions;
   const [test, setTest] = useState(props.test)
   useEffect(() => {
-    (async ()=>{
-      await ipcRenderer.on('questionAdded', (e:any, quest: any)=>{
-         const update = test.questions.push(quest)
-         setTest(update)
-      })
-    })()
+    (async () => {
+      await ipcRenderer.on('questionAdded', (e: any, t: any) => {
+        setTest(t)
+      });
+    })();
     return () => {
-      ipcRenderer.invoke('leave')
-      ipcRenderer.removeAllListeners('answerAdded', 'answerDeleted');
+      ipcRenderer.invoke('leave');
+      ipcRenderer.removeAllListeners('answerAdded', 'answerDeleted','questionAdded');
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[]);
-  //TODO: This test is cleanTest() add ipc for listening new questions
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <MainDiv>
       {test.questions.map((q: any) => (

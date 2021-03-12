@@ -34,7 +34,6 @@ app.on('ready', () => {
     createWindow();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     master = new MasterRouter(win)
-    // master.registerSocket('http://localhost:4000')
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
     console.log(powerSaveBlocker.isStarted(idPowerSaveBolcker));
     globalShortcut.register('Control+Alt+V', () => {
@@ -51,8 +50,8 @@ app.on('activate', () => {
 app.on('will-quit', () => {
     globalShortcut.unregisterAll()
     powerSaveBlocker.stop(idPowerSaveBolcker);
+    master.leave()
 })
 
 app.on('quit', () => {
-    master.leave()
 });
