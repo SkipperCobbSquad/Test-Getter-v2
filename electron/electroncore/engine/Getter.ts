@@ -148,7 +148,7 @@ class Getter extends EventEmitter {
     const mainQuest: string = rawQuest.join(' ');
 
     //Create hash from quest
-    const ID: number = this.generateHash(mainQuest)
+    let ID: number = this.generateHash(mainQuest)
 
     const mainAnswer: Array<AnswerInterface> = [];
     const rawTableAnswers: Array<any> = Array.from(
@@ -180,6 +180,8 @@ class Getter extends EventEmitter {
         };
         mainAnswer.push(answer);
       });
+
+      ID = this.generateHash(ID + mainAnswer.map(a => a.id).join(''))
     }
 
     const cleanQuest: QuestionInterface = {
@@ -193,6 +195,8 @@ class Getter extends EventEmitter {
     };
     return cleanQuest;
   }
+  
+  //Simple Hash function that allow to give each quest unique id
   private generateHash(toHash: string): number {
     let hash = 0;
     if (toHash.length === 0) {

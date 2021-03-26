@@ -60,6 +60,7 @@ function Single() {
         ></StyledInput>
         <i
           className="icofont-ui-play icofont-2x"
+          style={{color: '#000'}}
           onClick={() => {
             ipcRenderer.invoke('registerTest', input).then((res: string) => {
               if (res === 'ok') {

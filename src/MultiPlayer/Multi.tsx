@@ -35,6 +35,7 @@ const TestsDiv = styled.div`
 const SingleTestDiv: any = styled.div`
   display: flex;
   justify-content: center;
+  color: #000;
   background: #ffc8dd;
   border-radius: 10px;
   margin: 7px;
@@ -215,4 +216,3 @@ function Multi() {
 }
 
 export default Multi;
-//TODO: Nestet routing here Single

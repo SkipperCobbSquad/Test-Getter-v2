@@ -261,7 +261,6 @@ export class MasterRouter {
                     this.LiveFireEngine.answer(mainTestQuest.UsersAnswers)
                 } else {
                     this.mainTest.addQuestion(quest)
-                    //TODO: Add question to test
                 }
             }
         })

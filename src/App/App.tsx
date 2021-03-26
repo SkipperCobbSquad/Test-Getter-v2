@@ -82,7 +82,8 @@ const ContentDiv = styled.div`
   display: flex;
   flex 1;
   padding: 0px 10px;
-  background: #ffcbf2;
+  color: white;
+  background: #2a2c3e;
   border: 10px solid #6247aa;
   border-radius: 20px;
 `;

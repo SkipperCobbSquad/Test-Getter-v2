@@ -12,6 +12,7 @@ const ipcRenderer = window.require('electron').ipcRenderer.setMaxListeners(0);
 
 const QuestDiv = styled.div`
   display: flex;
+  color: #000;
   flex-direction: column;
   background: #815ac0;
   padding: 5px;
