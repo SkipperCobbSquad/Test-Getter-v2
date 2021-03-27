@@ -5,6 +5,7 @@ import styled from 'styled-components';
 // import withReactContent from 'sweetalert2-react-content';
 
 import ServerSettings from './Server';
+import ChromePath from './ChromePath';
 
 // const { ipcRenderer } = window.require('electron');
 
@@ -47,6 +48,7 @@ function Settings() {
       </StyledSection>
       <StyledSection>
         <SectionHader>Chrome Path</SectionHader>
+        <ChromePath></ChromePath>
       </StyledSection>
     </MainDiv>
   );
