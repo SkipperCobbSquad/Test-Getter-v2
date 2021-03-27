@@ -77,6 +77,16 @@ const LastServersDiv = styled.div`
   min-height: 5.3rem;
   max-height: 5.3rem;
   overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #6930c3a0;
+  }
 `;
 
 const LastServerP = styled.p`
@@ -90,16 +100,6 @@ const LastServerP = styled.p`
   user-select: none;
   &:hover{
     border-color: #7251b5;
-  }
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-  &::-webkit-scrollbar-track {
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: #6930c3a0;
   }
 `;
 

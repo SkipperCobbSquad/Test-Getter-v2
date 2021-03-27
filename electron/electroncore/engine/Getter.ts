@@ -26,13 +26,16 @@ class Getter extends EventEmitter {
     this.testID = '';
     this.numberQuest = 0;
     this.listOfQuestions = [];
-    if (this.os === 'win32') {
-      this.pathToChrome =
-        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-    } else {
-      this.pathToChrome = 'google-chrome';
-    }
+    this.pathToChrome =
+      this.os === 'win32'
+        ? 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+        : 'google-chrome';
   }
+
+  setCustomPathToChrome(path: string) {
+    this.pathToChrome = path;
+  }
+
   async getTest(url: string, type: TestType = TestType.UNKNOWN) {
     const browser = await puppeteer.launch({
       headless: false,
@@ -130,10 +133,12 @@ class Getter extends EventEmitter {
   }
   scrap(raw: Array<any>): QuestionInterface {
     const questType: QuestionType = raw[1].value;
-    let required: boolean = raw[2].querySelector('.mandatory_question') ? true : false
+    let required: boolean = raw[2].querySelector('.mandatory_question')
+      ? true
+      : false;
     let detectLatex: boolean =
       raw[4].querySelector('.rendered-latex') ||
-        raw[3].querySelector('.rendered-latex')
+      raw[3].querySelector('.rendered-latex')
         ? true
         : false;
 
@@ -148,7 +153,7 @@ class Getter extends EventEmitter {
     const mainQuest: string = rawQuest.join(' ');
 
     //Create hash from quest
-    let ID: number = this.generateHash(mainQuest)
+    let ID: number = this.generateHash(mainQuest);
 
     const mainAnswer: Array<AnswerInterface> = [];
     const rawTableAnswers: Array<any> = Array.from(
@@ -181,7 +186,7 @@ class Getter extends EventEmitter {
         mainAnswer.push(answer);
       });
 
-      ID = this.generateHash(ID + mainAnswer.map(a => a.id).join(''))
+      ID = this.generateHash(ID + mainAnswer.map((a) => a.id).join(''));
     }
 
     const cleanQuest: QuestionInterface = {
@@ -195,7 +200,7 @@ class Getter extends EventEmitter {
     };
     return cleanQuest;
   }
-  
+
   //Simple Hash function that allow to give each quest unique id
   private generateHash(toHash: string): number {
     let hash = 0;
@@ -204,22 +209,22 @@ class Getter extends EventEmitter {
     }
     for (let i = 0; i < toHash.length; i++) {
       const char = toHash.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash);
   }
   private getLatex(par: HTMLParagraphElement): Array<string> {
-    const m = Array.from(par.childNodes)
-    const w: Array<string> = []
+    const m = Array.from(par.childNodes);
+    const w: Array<string> = [];
     m.forEach((t: any) => {
       if (t.children) {
-        w.push(t.children[0].textContent)
+        w.push(t.children[0].textContent);
       } else {
-        w.push(t.textContent)
+        w.push(t.textContent);
       }
-    })
-    return w
+    });
+    return w;
   }
   private async requierer(quest: QuestionInterface) {
     if (quest.type === QuestionType.DESCRIPTIVE) {
@@ -227,7 +232,8 @@ class Getter extends EventEmitter {
       await this.page.waitForTimeout(2000);
       await this.page.evaluate(() => {
         const ifr: any = document.querySelector('#givenAnswer_ifr');
-        ifr.contentWindow.document.querySelector('p').innerText = 'Error: Cant`t read value of null';
+        ifr.contentWindow.document.querySelector('p').innerText =
+          'Error: Cant`t read value of null';
         return 0;
       });
     } else if (quest.type === QuestionType.SHORT_ANSWER) {
@@ -257,9 +263,9 @@ export default Getter;
 //           res+=child.childern[0].textContent
 //       }
 //       else{
-//           res+=get(child)    
+//           res+=get(child)
 //       }
 
 //   }
-//   return res 
+//   return res
 // }

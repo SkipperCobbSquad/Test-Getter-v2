@@ -15,12 +15,12 @@ const MainDiv = styled.div`
   flex-direction: column;
   overflow-y: auto;
   &::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
   }
   &::-webkit-scrollbar-track {
     border-radius: 10px;
   }
-  &::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb {;
     border-radius: 10px;
     background: #6930c3a0;
   }
@@ -29,7 +29,7 @@ const MainDiv = styled.div`
 const StyledSection = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 10px 0;
+  margin: 10px 5px 10px 2px;
 `;
 
 const SectionHader = styled.h1`

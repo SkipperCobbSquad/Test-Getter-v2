@@ -15,6 +15,7 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: false,
         },
+        darkTheme: true,
         show: false,
         // icon: path.join(__dirname, 'Logo.png')
     });
