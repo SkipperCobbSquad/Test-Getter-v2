@@ -49,6 +49,17 @@ function Single() {
     // return ()=>{ipcRenderer.removeAllListeners(); ipcRenderer.invoke('leave')}
   }, []);
 
+  const registerTest = (name: string)=>{
+    ipcRenderer
+    .invoke('registerTest', input, name)
+    .then((res: string) => {
+      console.log(res);
+      if (res === 'ok') {
+        setReady(true);
+      }
+    });
+  }
+
   return (
     <MainSingleDiv>
       <h1>SinglePlayer Mode</h1>
@@ -60,13 +71,16 @@ function Single() {
         ></StyledInput>
         <i
           className="icofont-ui-play icofont-2x"
-          style={{color: '#000'}}
+          style={{ color: '#000' }}
           onClick={() => {
-            ipcRenderer.invoke('registerTest', input).then((res: string) => {
-              if (res === 'ok') {
-                setReady(true);
-              }
-            });
+            registerTest('')
+          }}
+        ></i>
+        <i
+          style={{ color: '#e25822' }}
+          className="icofont-fire-burn icofont-2x"
+          onClick={()=>{
+            registerTest('livefire')
           }}
         ></i>
       </InputWrapper>

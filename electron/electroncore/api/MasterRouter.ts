@@ -49,7 +49,7 @@ export class MasterRouter {
           this.getterEngine.setCustomPathToChrome(path);
         }
       });
-    
+
     this.ipc.handle('customChromePath', (e, path: string) => {
       return new Promise((resolve, reject) => {
         if (process.platform === 'win32') {
@@ -116,16 +116,31 @@ export class MasterRouter {
       (e: any, testURL: string, testName: string) => {
         return new Promise((resolve, reject) => {
           this.getterEngine.removeAllListeners();
+          const splitedName = testName.split(' ');
           if (
-            !(
-              this.operatingMode === Mode.MULTI &&
-              this.mainTest &&
-              testURL === 'cashe'
-            )
+            splitedName[splitedName.length - 1].toLowerCase() === 'livefire'
           ) {
+            console.log('here1');
+            const testID = testURL.split('=')[1];
+            const fakeTest: TestInterface = {
+              id: testID,
+              numberOfQuestions: 0,
+              questions: [],
+            };
+            this.mainTest = new Test(fakeTest);
+            if (this.operatingMode === Mode.SINGLE) {
+              this.singleRegister().then((res) => resolve(res));
+            } else if (this.operatingMode === Mode.MULTI) {
+              this.multiRegister(testName)
+                .then((result) => {
+                  resolve(result);
+                })
+                .catch((err) => {
+                  reject(err);
+                });
+            }
+          } else {
             this.getterEngine.getTest(testURL);
-            //TODO: Make cashe backup :)
-            //TODO: Register live fire session
           }
           this.getterEngine.on('status', (status: string) => {
             this.bWin.webContents.send('getter-status', status);
@@ -141,31 +156,15 @@ export class MasterRouter {
           this.getterEngine.on('ready', (test: Test) => {
             this.mainTest = test;
             if (this.operatingMode === Mode.SINGLE) {
-              this.singleTestTunel();
-              resolve(ServerCallbacks.OK);
+              this.singleRegister().then((res) => resolve(res));
             } else if (this.operatingMode === Mode.MULTI) {
-              if (!this.socket) {
-                reject('You are not connected');
-              }
-              const rawTest: TestInterface = {
-                id: test.ID,
-                numberOfQuestions: test.numberOfQuestions,
-                questions: test.questions,
-              };
-              this.socket.emit(
-                'registerTest',
-                testName,
-                JSON.stringify(rawTest),
-                (status: PBCall | PVCall) => {
-                  if (status.status === ServerCallbacks.OK) {
-                    this.testName = testName;
-                    this.multiTestTunel();
-                    resolve(ServerCallbacks.OK);
-                  } else {
-                    reject(status.reason);
-                  }
-                }
-              );
+              this.multiRegister(testName)
+                .then((result) => {
+                  resolve(result);
+                })
+                .catch((err) => {
+                  reject(err);
+                });
             }
           });
         });
@@ -196,6 +195,41 @@ export class MasterRouter {
     //Leave handler
     this.ipc.handle('leave', () => {
       this.leave();
+    });
+  }
+
+  private singleRegister() {
+    return new Promise((resolve, reject) => {
+      this.singleTestTunel();
+      resolve(ServerCallbacks.OK);
+    });
+  }
+
+  private multiRegister(testName: string) {
+    return new Promise((resolve, reject) => {
+      if (!this.socket) {
+        reject('You are not connected');
+      }
+      const name = `${testName}#${this.mainTest.ID}`;
+      const rawTest: TestInterface = {
+        id: this.mainTest.ID,
+        numberOfQuestions: this.mainTest.numberOfQuestions,
+        questions: this.mainTest.questions,
+      };
+      this.socket.emit(
+        'registerTest',
+        testName,
+        JSON.stringify(rawTest),
+        (status: PBCall | PVCall) => {
+          if (status.status === ServerCallbacks.OK) {
+            this.testName = name;
+            this.multiTestTunel();
+            resolve(ServerCallbacks.OK);
+          } else {
+            reject(status.reason);
+          }
+        }
+      );
     });
   }
 
