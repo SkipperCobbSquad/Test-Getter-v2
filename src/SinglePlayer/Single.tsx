@@ -49,16 +49,18 @@ function Single() {
     // return ()=>{ipcRenderer.removeAllListeners(); ipcRenderer.invoke('leave')}
   }, []);
 
-  const registerTest = (name: string)=>{
-    ipcRenderer
-    .invoke('registerTest', input, name)
-    .then((res: string) => {
-      console.log(res);
-      if (res === 'ok') {
-        setReady(true);
-      }
-    });
-  }
+  const registerTest = (name: string) => {
+    if (input !== '') {
+      ipcRenderer.invoke('registerTest', input, name).then((res: string) => {
+        console.log(res);
+        if (res === 'ok') {
+          setReady(true);
+        }
+      });
+    } else {
+      setStatus('Can`t perform whit out test URL');
+    }
+  };
 
   return (
     <MainSingleDiv>
@@ -71,16 +73,16 @@ function Single() {
         ></StyledInput>
         <i
           className="icofont-ui-play icofont-2x"
-          style={{ color: '#000' }}
+          style={{ color: '#000', cursor: 'pointer' }}
           onClick={() => {
-            registerTest('')
+            registerTest('');
           }}
         ></i>
         <i
-          style={{ color: '#e25822' }}
+          style={{ color: '#e25822', cursor: 'pointer' }}
           className="icofont-fire-burn icofont-2x"
-          onClick={()=>{
-            registerTest('livefire')
+          onClick={() => {
+            registerTest('livefire');
           }}
         ></i>
       </InputWrapper>

@@ -93,10 +93,21 @@ class Getter extends EventEmitter {
       await this.clean();
     } catch (error) {
       await browser.close();
-      await this.clean();
       console.log(error.toString());
-      await this.emit('status', error.toString());
-      await this.emit('error', error.toString());
+      if (this.listOfQuestions.length > 0) {
+        const mainTest: TestInterface = {
+          id: this.testID,
+          numberOfQuestions: this.listOfQuestions.length,
+          questions: this.listOfQuestions,
+        };
+        await this.emit('ready', new Test(mainTest, type));
+        await this.emit('status', 'Panic Mode');
+        await this.emit('error', 'Panic Mode');
+      } else {
+        await this.emit('status', error.toString());
+        await this.emit('error', error.toString());
+      }
+      await this.clean();
     }
   }
 

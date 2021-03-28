@@ -10,15 +10,16 @@ import Single from './MasterAnswers/MasterSingle';
 const Latex: any = require('react-latex');
 const ipcRenderer = window.require('electron').ipcRenderer.setMaxListeners(0);
 
-const QuestDiv = styled.div`
+const QuestDiv: any = styled.div`
   display: flex;
   color: #000;
   flex-direction: column;
   background: #815ac0;
   padding: 5px;
   margin: 10px;
-  border: 10px solid #6247aa;
+  border: 10px solid ${(props: any) => (props.focused ? '#e25822' : '#6247aa')};
   border-radius: 20px;
+  transition: border-color 0.15s ease-in-out;
 `;
 const QuestTop = styled.div`
   flex: 1;
@@ -36,6 +37,7 @@ function MasterQuestion(props: any) {
   const qR: QuestionInterface = props.quest;
   const MasterQest = useRef<HTMLDivElement>(null);
   const [q, setQ] = useState(qR);
+  const [focused, setFocus] = useState(false);
   useEffect(() => {
     (async () => {
       await ipcRenderer.on(
@@ -58,6 +60,8 @@ function MasterQuestion(props: any) {
       await ipcRenderer.on('focus', (e: any, id: number) => {
         if (q.id === id) {
           MasterQest?.current?.scrollIntoView();
+          setFocus(true)
+          setTimeout(()=>{setFocus(false)}, 3000)
         }
       });
     })();
@@ -99,7 +103,7 @@ function MasterQuestion(props: any) {
   };
 
   return (
-    <QuestDiv ref={MasterQest}>
+    <QuestDiv ref={MasterQest} focused={focused}>
       <QuestTop>
         <QuestPTop>
           {q.hasLatex ? <Latex>{q.question}</Latex> : q.question}

@@ -151,7 +151,9 @@ export class MasterRouter {
               title: 'Error from Getter',
               body: err,
             }).show();
-            reject(err);
+            if (!(err !== 'Panic Mode')) {
+              reject(err);
+            }
           });
           this.getterEngine.on('ready', (test: Test) => {
             this.mainTest = test;
@@ -267,6 +269,7 @@ export class MasterRouter {
     });
   }
 
+  //TODO: Rewrite some listeners answerAddwd answerDeleted
   private singleTestTunel() {
     this.ipc.handle('test', async () => {
       return this.mainTest.cleanTest();
@@ -443,6 +446,8 @@ export class MasterRouter {
       }
     });
   }
+
+  //------------------------------------------------------->
 
   leave() {
     if (this.socket) {
