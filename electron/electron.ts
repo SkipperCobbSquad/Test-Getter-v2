@@ -28,13 +28,13 @@ function createWindow() {
 
     win.on('ready-to-show', () => {
         win?.show();
+        master = new MasterRouter(win)
     });
 }
 
 app.on('ready', () => {
     createWindow();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    master = new MasterRouter(win)
     idPowerSaveBolcker = powerSaveBlocker.start('prevent-display-sleep');
     console.log(powerSaveBlocker.isStarted(idPowerSaveBolcker));
     globalShortcut.register('Control+Alt+V', () => {

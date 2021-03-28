@@ -16,6 +16,7 @@ export class LiveFire extends EventEmitter {
 
         this.ioServer.on('connection', (socket: Socket) => {
             this.socket = socket
+            this.emit('liveFireStatus', 'Connected')
             socket.on('setTestID', (id) => {
                 console.log(id);
                 this.testId = id;
@@ -23,6 +24,10 @@ export class LiveFire extends EventEmitter {
 
             socket.on('quest', (raw: string) => {
                 this.emit('quest', raw)
+            })
+
+            socket.on('disconnect',(reason)=>{
+                this.emit('liveFireStatus', 'Disconnected')
             })
         })
 

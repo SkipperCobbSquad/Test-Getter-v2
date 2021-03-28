@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import '../icofont/icofont.min.css';
 import 'katex/dist/katex.min.css';
-import "@fontsource/ubuntu"
+import '@fontsource/ubuntu';
 import './App.css';
 
 const { ipcRenderer } = window.require('electron');
@@ -95,8 +95,20 @@ const BackToMenu = styled.div`
   cursor: pointer;
 `;
 
+const LiveFireStatus :any = styled.div`
+  display: flex;
+  position: fixed;
+  z-index: 10000;
+  top: 25px;
+  right: 25px;
+  color: ${(props : any) => props.conn === 'Connected'? '#e25822': '#d3d3d3'};
+`;
+
+//#e25822
+
 function App() {
   const [location, setLocation] = useState(false);
+  const [liveFire, setLiveFire] = useState('');
   useEffect(() => {
     (async () => {
       ipcRenderer.on('socketStatusError', (e: any, stat: any) => {
@@ -110,6 +122,10 @@ function App() {
         }).then(() => {
           sessionStorage.removeItem('connection');
         });
+      });
+      ipcRenderer.on('liveStatus', (e: any, status: string) => {
+        setLiveFire(status);
+        console.log(status);
       });
     })();
   }, []);
@@ -177,6 +193,9 @@ function App() {
             >
               <i className="icofont-arrow-right icofont-rotate-180 icofont-2x"></i>
             </BackToMenu>
+            <LiveFireStatus conn={liveFire}>
+              <i className="icofont-fire-burn icofont-2x"></i>
+            </LiveFireStatus>
             <Switch>
               <Route exact path="/" component={Home}></Route>
               <Route path="/singleplayer" component={Single}></Route>

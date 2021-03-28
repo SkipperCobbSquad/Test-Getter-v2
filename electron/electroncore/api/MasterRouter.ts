@@ -61,6 +61,8 @@ export class MasterRouter {
       });
     });
 
+    this.liveFireConnection();
+
     //Server & Mode section handlers
     this.ipc.handle('mode', (e: any, mode: Mode) => {
       this.operatingMode = mode;
@@ -354,6 +356,13 @@ export class MasterRouter {
     this.registerLiveFire();
   }
 
+  //Handle connection status from LiveFire
+  private liveFireConnection() {
+    this.LiveFireEngine.on('liveFireStatus', (status: string) => {
+      this.bWin.webContents.send('liveStatus', status);
+    });
+  }
+
   private registerLiveFire() {
     this.LiveFireEngine.on('quest', (raw: string) => {
       if (this.LiveFireEngine.testId === this.mainTest.ID) {
@@ -457,7 +466,7 @@ export class MasterRouter {
     this.ipc.removeHandler('answerAdded');
     this.ipc.removeHandler('answerDeleted');
     this.ipc.removeHandler('test');
-    this.ipc.removeAllListeners();
+    this.ipc.removeAllListeners('quest');
 
     this.LiveFireEngine.removeAllListeners();
   }
