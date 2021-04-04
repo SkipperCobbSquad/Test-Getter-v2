@@ -4,6 +4,10 @@
   "private": false,
   "main": "public/electron.js",
   "homepage": "./",
+  "author":{
+    "name": "SkipperCobbSquad",
+    "url": "https://github.com/SkipperCobbSquad"
+  },
   "dependencies": {
     "@fontsource/ubuntu": "^4.2.2",
     "@testing-library/jest-dom": "^5.11.9",
