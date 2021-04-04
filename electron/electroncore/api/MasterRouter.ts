@@ -38,17 +38,8 @@ export class MasterRouter {
     this.bWin = window;
     this.socketRegistered = false;
     this.getterEngine = new Getter();
-    this.LiveFireEngine = new LiveFire();
 
     //Settings handlers
-    //On startup check user defined path to Crome engine
-    this.bWin.webContents
-      .executeJavaScript('localStorage.getItem(`chromePath`);', true)
-      .then((path) => {
-        if (path !== '') {
-          this.getterEngine.setCustomPathToChrome(path);
-        }
-      });
 
     this.ipc.handle('customChromePath', (e, path: string) => {
       return new Promise((resolve, reject) => {
@@ -60,8 +51,6 @@ export class MasterRouter {
         }
       });
     });
-
-    this.liveFireConnection();
 
     //Server & Mode section handlers
     this.ipc.handle('mode', (e: any, mode: Mode) => {
@@ -200,6 +189,25 @@ export class MasterRouter {
     this.ipc.handle('leave', () => {
       this.leave();
     });
+  }
+
+  //This must be here bcs bwindow emit every f**king time event ready-to-show and show when open devTools
+  public initLiveFireAndCustomChrome() {
+    if (!this.LiveFireEngine) {
+      this.LiveFireEngine = new LiveFire();
+      this.liveFireConnection();
+
+      //On startup check user defined path to Crome engine
+      this.bWin.webContents
+        .executeJavaScript('localStorage.getItem(`chromePath`);', true)
+        .then((path) => {
+          if (path !== '') {
+            this.getterEngine.setCustomPathToChrome(path);
+          }
+        });
+    }
+
+    console.log('Hahahaha');
   }
 
   private singleRegister() {
