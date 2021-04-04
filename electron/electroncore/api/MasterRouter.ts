@@ -177,7 +177,7 @@ export class MasterRouter {
 
     this.ipc.handle('exporTest', (e: any) => {
       if (this.mainTest) {
-        const raw: String = JSON.stringify(this.mainTest, null, 4);
+        const raw: string = JSON.stringify(this.mainTest, null, 4);
         writeFile(`test-${this.testName}.json`, raw, (err) => {
           if (err) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -286,10 +286,10 @@ export class MasterRouter {
     this.mainTest.on('answerAdded', (q: QuestionInterface) => {
       this.bWin.webContents.send('answerAdded', q);
       if (
-        this.LiveFireEngine.currentQuest === q.id &&
-        this.LiveFireEngine.testId === this.mainTest.ID
+        this.LiveFireEngine?.currentQuest === q.id &&
+        this.LiveFireEngine?.testId === this.mainTest.ID
       ) {
-        this.LiveFireEngine.answer(q.UsersAnswers);
+        this.LiveFireEngine?.answer(q.UsersAnswers);
       }
     });
     this.ipc.handle(

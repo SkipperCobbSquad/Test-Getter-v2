@@ -66,7 +66,7 @@ function MasterSingle(props: SingleMulti) {
   };
 
   const chandleChange = (answer: AnswerInterface) => {
-    const update: any = [...answers];
+    const update: any = answers;
     if (answers.length) {
       const findX = answers.findIndex((a: any) => a.id === answer.id);
       if (findX >= 0) {
