@@ -142,7 +142,7 @@ export class MasterRouter {
               title: 'Error from Getter',
               body: err,
             }).show();
-            if (!(err !== 'Panic Mode')) {
+            if (err !== 'Panic Mode') {
               reject(err);
             }
           });
